@@ -1,0 +1,48 @@
+import Foundation
+import Combine
+
+@MainActor
+final class AuthStore: ObservableObject {
+    @Published private(set) var profile: Profile?
+    @Published private(set) var isRestoring = true
+    @Published private(set) var isLoading = false
+    @Published var error: String?
+
+    private let service = AuthService()
+
+    var isAuthenticated: Bool { profile != nil }
+
+    func restoreSession() async {
+        guard isRestoring else { return }
+        profile = await service.restoreProfile()
+        isRestoring = false
+    }
+
+    func login(username: String, password: String) async {
+        guard !isLoading else { return }
+        isLoading = true
+        error = nil
+        defer { isLoading = false }
+
+        do {
+            profile = try await service.signIn(username: username, password: password)
+        } catch {
+            self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+        }
+    }
+
+    func logout() async {
+        isLoading = true
+        defer { isLoading = false }
+        try? await service.signOut()
+        profile = nil
+        error = nil
+    }
+
+    func refreshProfile() async {
+        guard let current = profile else { return }
+        if let updated = try? await service.fetchProfile(userId: current.id) {
+            profile = updated
+        }
+    }
+}
