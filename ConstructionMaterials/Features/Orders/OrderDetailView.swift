@@ -9,6 +9,9 @@ struct OrderDetailView: View {
     @State private var isLoading = true
     @State private var error: String?
     @State private var showDeliverySheet = false
+    @State private var showPaymentSheet = false
+    @State private var showEditSheet = false
+    @State private var showCancelConfirm = false
     @State private var busyItemIndex: Int?
 
     private let service = InvoiceService()
@@ -47,12 +50,33 @@ struct OrderDetailView: View {
         .refreshable { await load() }
         .task { await load() }
         .toolbar {
-            if let invoice, invoice.canDeliver {
+            if let invoice {
+                if invoice.canDeliver {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            showDeliverySheet = true
+                        } label: {
+                            Label("Giao hàng", systemImage: "shippingbox.fill")
+                        }
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showDeliverySheet = true
+                    Menu {
+                        Button {
+                            showEditSheet = true
+                        } label: {
+                            Label("Sửa hóa đơn", systemImage: "pencil")
+                        }
+
+                        if !invoice.isCancelled {
+                            Button(role: .destructive) {
+                                showCancelConfirm = true
+                            } label: {
+                                Label("Hủy hóa đơn", systemImage: "xmark.circle")
+                            }
+                        }
                     } label: {
-                        Label("Giao hàng", systemImage: "shippingbox.fill")
+                        Image(systemName: "ellipsis.circle")
                     }
                 }
             }
@@ -64,6 +88,32 @@ struct OrderDetailView: View {
                     Task { await loadRecords() }
                 }
             }
+        }
+        .sheet(isPresented: $showPaymentSheet) {
+            if let invoice {
+                PaymentSheet(invoice: invoice) { updated in
+                    self.invoice = updated
+                }
+            }
+        }
+        .sheet(isPresented: $showEditSheet) {
+            if let invoice {
+                EditInvoiceView(invoice: invoice) { updated in
+                    self.invoice = updated
+                }
+            }
+        }
+        .confirmationDialog(
+            "Hủy hóa đơn này?",
+            isPresented: $showCancelConfirm,
+            titleVisibility: .visible
+        ) {
+            Button("Hủy hóa đơn", role: .destructive) {
+                Task { await cancelInvoice() }
+            }
+            Button("Giữ lại", role: .cancel) {}
+        } message: {
+            Text("Hóa đơn đã hủy sẽ không thể giao hàng tiếp.")
         }
     }
 
@@ -103,6 +153,16 @@ struct OrderDetailView: View {
                 DetailMetric(title: "Đã thanh toán", value: Formatters.money(invoice.paidValue), color: AppTheme.success)
                 DetailMetric(title: "Còn lại", value: Formatters.money(invoice.remainingValue), color: AppTheme.danger)
                 DetailMetric(title: "Đã giao", value: Formatters.money(invoice.items.reduce(0) { $0 + ($1.deliveredAmount ?? 0) }), color: AppTheme.info)
+            }
+
+            if invoice.remainingValue > 0 && !invoice.isCancelled {
+                Button {
+                    showPaymentSheet = true
+                } label: {
+                    Label("Thanh toán", systemImage: "creditcard.fill")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
             }
         }
         .appCard()
@@ -156,6 +216,16 @@ struct OrderDetailView: View {
             self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
         isLoading = false
+        #if DEBUG
+        if invoice != nil, let screen = ProcessInfo.processInfo.environment["IOS_TEST_SCREEN"] {
+            switch screen {
+            case "editInvoice": showEditSheet = true
+            case "payment": showPaymentSheet = true
+            case "delivery": showDeliverySheet = true
+            default: break
+            }
+        }
+        #endif
     }
 
     @MainActor
@@ -181,6 +251,17 @@ struct OrderDetailView: View {
             self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
         busyItemIndex = nil
+    }
+
+    @MainActor
+    private func cancelInvoice() async {
+        guard let invoice else { return }
+        error = nil
+        do {
+            self.invoice = try await service.updateStatus(invoice: invoice, status: "cancelled")
+        } catch {
+            self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+        }
     }
 }
 

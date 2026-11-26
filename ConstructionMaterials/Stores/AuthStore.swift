@@ -39,6 +39,24 @@ final class AuthStore: ObservableObject {
         error = nil
     }
 
+    func updateProfile(fullname: String, phoneNumber: String, bankName: String, bankNumber: String) async {
+        guard let current = profile else { return }
+        isLoading = true
+        error = nil
+        defer { isLoading = false }
+        do {
+            profile = try await service.updateProfile(
+                userId: current.id,
+                fullname: fullname,
+                phoneNumber: phoneNumber,
+                bankName: bankName,
+                bankNumber: bankNumber
+            )
+        } catch {
+            self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+        }
+    }
+
     func refreshProfile() async {
         guard let current = profile else { return }
         if let updated = try? await service.fetchProfile(userId: current.id) {

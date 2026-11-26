@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		04A97F6248D7D4B89421A21F /* StatusChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB280C01F1466A327A8CCC2 /* StatusChip.swift */; };
+		072361D50ADBDDDDF8E03701 /* StockIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EFB1DC01A3BA446CB0254E0 /* StockIn.swift */; };
+		128046C4175D101292874DED /* StockInListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD9ACC7F2C47FC2BD9DBF1A /* StockInListView.swift */; };
 		139CE02834427B7346AAA4EC /* InvoiceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1305C1292E5D8A9E82E4EE3 /* InvoiceService.swift */; };
 		16912344313A54A0196F3D62 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = D04EC8ABDBA92B27BA455DAE /* Supabase */; };
 		1784004ED8C9AC8087300537 /* Material.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBECF31B32CE01F7CDF54B2A /* Material.swift */; };
@@ -17,6 +19,7 @@
 		55A2FC173A4046AA946C2215 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D42012D59CCB52BFFF0CDD /* Profile.swift */; };
 		5A32CBD2EE74078E87BC619A /* Formatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08992C72B0254F6C7A391213 /* Formatters.swift */; };
 		5EC0EDD18755B0AD8278F1BF /* DeliveryHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D423E7ACABE882D6959AA5 /* DeliveryHistoryView.swift */; };
+		660A0CC6D850F827115566E2 /* CustomerDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A33E6E20519E2E331CFA3A12 /* CustomerDetailView.swift */; };
 		6C6FBC8854B9E8CBBB880671 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B82337E3592ACE6D39A16F /* RootView.swift */; };
 		7937E185BE8F36FA009BC2A7 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B4985F0FC41340C7DE0560 /* AuthService.swift */; };
 		7E5AD0FE44BE7C94CC6FFD03 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03908A0F33B5C2A27F22D33F /* DashboardView.swift */; };
@@ -26,17 +29,27 @@
 		9DF3B21B42D36A5B71884C68 /* DeliveryRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81CE24220BC0E093A920641C /* DeliveryRecord.swift */; };
 		A10222467B938069C05C1064 /* OrderRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C59478253EA277D7B00ED18 /* OrderRow.swift */; };
 		A265D1EE38516CF679BAD7A3 /* Invoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 050D92A5DDF85B932681CAF8 /* Invoice.swift */; };
+		A8E34333FB3A02BA191235FF /* RevenueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9F9CEA8150CD200355FD00 /* RevenueView.swift */; };
 		AC5FF880B53D137CC490727D /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DCE7D403BEE4B8FDD29F7D2 /* Theme.swift */; };
 		B06909AFD16D58CF64CA29E3 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998569FE96BF456BA1C2FFD4 /* SectionHeader.swift */; };
 		B99E30C41994CAC9228A49C4 /* MaterialService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24DB3554DE3BF1FF0CB51BE9 /* MaterialService.swift */; };
+		BE3B700393899189D4CE3D2B /* StockInService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E63E5D8504946B71E80FCE99 /* StockInService.swift */; };
 		BE3C5FD5E066FF3DD90B2D3A /* DeliverySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16CA61B7E2A19B1ABCF495F /* DeliverySheet.swift */; };
 		CB028013142C93C618AE2142 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB43666D331A52E0BEB1B74B /* LoginView.swift */; };
+		CB851910FEDD0A0459BFF24B /* CreateInvoiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442DDD537D7D2916EF97746B /* CreateInvoiceView.swift */; };
 		D84B69CFBFB30A103C3E627C /* StatusStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F2FCD47C725EF45F84B2CC /* StatusStyles.swift */; };
 		D95885544C171D6F516E66BA /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7E0F913CA2BA3B98C2D9C55 /* MainTabView.swift */; };
+		DA44D5C36A61A9B789180F69 /* StockInFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18359BE0CC8CCC250C98BCD9 /* StockInFormView.swift */; };
+		E5F54CCD575F04B9636D9CA4 /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829CA916C4D72B3B6AC4D083 /* ProfileEditView.swift */; };
 		E79DDFF931C9F81A435E0197 /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 441F587DE54CA2B01EF669BE /* MoreView.swift */; };
 		EB49A97291061CEE8072ABDD /* OrdersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9B961BA950EEAA882EA620 /* OrdersView.swift */; };
 		EB91C8AD0F138F8FD5E312AD /* SupabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33389B805F0F44CAE0FA9C07 /* SupabaseManager.swift */; };
+		ECB6CB56776E1BB33C6036E1 /* EditInvoiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46599459BB23261A67FAE3DF /* EditInvoiceView.swift */; };
 		F0AA90DEF58FAA2D58325990 /* SummaryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D585861A2DFC43E1163BECE2 /* SummaryCard.swift */; };
+		F0B09680339764BA999862DD /* CustomerSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA29F9415AA6743734EE799 /* CustomerSummary.swift */; };
+		F3EB3B704259C323BBD8C4D8 /* PaymentSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB76246313E19B1586637A07 /* PaymentSheet.swift */; };
+		F4B65467B236EDBF3450EE3A /* CustomersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79DEEB107F8B90B682AE7F40 /* CustomersView.swift */; };
+		FA2F09E4E83D5D404AC1663A /* MaterialFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9E77E7C0BEACABC42FED4 /* MaterialFormView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +57,7 @@
 		04B82337E3592ACE6D39A16F /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		050D92A5DDF85B932681CAF8 /* Invoice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Invoice.swift; sourceTree = "<group>"; };
 		08992C72B0254F6C7A391213 /* Formatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatters.swift; sourceTree = "<group>"; };
+		18359BE0CC8CCC250C98BCD9 /* StockInFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockInFormView.swift; sourceTree = "<group>"; };
 		24DB3554DE3BF1FF0CB51BE9 /* MaterialService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaterialService.swift; sourceTree = "<group>"; };
 		27096A13E2D4869051C7A977 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		2AC7935B8B7A7BCC0E4959A3 /* ConstructionMaterialsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstructionMaterialsApp.swift; sourceTree = "<group>"; };
@@ -51,7 +65,12 @@
 		34955AE07634BE271888851D /* OrderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderDetailView.swift; sourceTree = "<group>"; };
 		3DCE7D403BEE4B8FDD29F7D2 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		441F587DE54CA2B01EF669BE /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
+		442DDD537D7D2916EF97746B /* CreateInvoiceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateInvoiceView.swift; sourceTree = "<group>"; };
+		46599459BB23261A67FAE3DF /* EditInvoiceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditInvoiceView.swift; sourceTree = "<group>"; };
+		4EFB1DC01A3BA446CB0254E0 /* StockIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockIn.swift; sourceTree = "<group>"; };
+		79DEEB107F8B90B682AE7F40 /* CustomersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomersView.swift; sourceTree = "<group>"; };
 		81CE24220BC0E093A920641C /* DeliveryRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveryRecord.swift; sourceTree = "<group>"; };
+		829CA916C4D72B3B6AC4D083 /* ProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditView.swift; sourceTree = "<group>"; };
 		885B0BC8BD62B264068C1CC7 /* LoadingStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingStateView.swift; sourceTree = "<group>"; };
 		9480EC6D50ECCA98EAFFED38 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		979B8F4626504861DD9C6CF6 /* ConstructionMaterials.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ConstructionMaterials.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -59,14 +78,21 @@
 		9AB280C01F1466A327A8CCC2 /* StatusChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusChip.swift; sourceTree = "<group>"; };
 		9B9B961BA950EEAA882EA620 /* OrdersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersView.swift; sourceTree = "<group>"; };
 		9C59478253EA277D7B00ED18 /* OrderRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderRow.swift; sourceTree = "<group>"; };
+		9FB9E77E7C0BEACABC42FED4 /* MaterialFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaterialFormView.swift; sourceTree = "<group>"; };
+		A33E6E20519E2E331CFA3A12 /* CustomerDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomerDetailView.swift; sourceTree = "<group>"; };
+		AB76246313E19B1586637A07 /* PaymentSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSheet.swift; sourceTree = "<group>"; };
 		B5D42012D59CCB52BFFF0CDD /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 		C9F2FCD47C725EF45F84B2CC /* StatusStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusStyles.swift; sourceTree = "<group>"; };
+		CAD9ACC7F2C47FC2BD9DBF1A /* StockInListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockInListView.swift; sourceTree = "<group>"; };
 		CB43666D331A52E0BEB1B74B /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		CCCB2B4A842626095E1FEF08 /* AuthStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthStore.swift; sourceTree = "<group>"; };
 		D585861A2DFC43E1163BECE2 /* SummaryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryCard.swift; sourceTree = "<group>"; };
 		D9E8C4D009DA361B4F37948E /* InventoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryView.swift; sourceTree = "<group>"; };
+		DBA29F9415AA6743734EE799 /* CustomerSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomerSummary.swift; sourceTree = "<group>"; };
 		DBECF31B32CE01F7CDF54B2A /* Material.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Material.swift; sourceTree = "<group>"; };
+		DC9F9CEA8150CD200355FD00 /* RevenueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueView.swift; sourceTree = "<group>"; };
 		E1F098B9FAB4301AD0E17AAC /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		E63E5D8504946B71E80FCE99 /* StockInService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockInService.swift; sourceTree = "<group>"; };
 		E6D423E7ACABE882D6959AA5 /* DeliveryHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveryHistoryView.swift; sourceTree = "<group>"; };
 		E96454962EE6CC6B5CC621FD /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		E9B4985F0FC41340C7DE0560 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
@@ -90,9 +116,12 @@
 		04E65B1F1407D0FC99E20F3E /* Orders */ = {
 			isa = PBXGroup;
 			children = (
+				442DDD537D7D2916EF97746B /* CreateInvoiceView.swift */,
 				F16CA61B7E2A19B1ABCF495F /* DeliverySheet.swift */,
+				46599459BB23261A67FAE3DF /* EditInvoiceView.swift */,
 				34955AE07634BE271888851D /* OrderDetailView.swift */,
 				9B9B961BA950EEAA882EA620 /* OrdersView.swift */,
+				AB76246313E19B1586637A07 /* PaymentSheet.swift */,
 			);
 			path = Orders;
 			sourceTree = "<group>";
@@ -103,6 +132,7 @@
 				E9B4985F0FC41340C7DE0560 /* AuthService.swift */,
 				F1305C1292E5D8A9E82E4EE3 /* InvoiceService.swift */,
 				24DB3554DE3BF1FF0CB51BE9 /* MaterialService.swift */,
+				E63E5D8504946B71E80FCE99 /* StockInService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -112,6 +142,7 @@
 			children = (
 				E6D423E7ACABE882D6959AA5 /* DeliveryHistoryView.swift */,
 				441F587DE54CA2B01EF669BE /* MoreView.swift */,
+				829CA916C4D72B3B6AC4D083 /* ProfileEditView.swift */,
 			);
 			path = More;
 			sourceTree = "<group>";
@@ -120,6 +151,7 @@
 			isa = PBXGroup;
 			children = (
 				D9E8C4D009DA361B4F37948E /* InventoryView.swift */,
+				9FB9E77E7C0BEACABC42FED4 /* MaterialFormView.swift */,
 			);
 			path = Inventory;
 			sourceTree = "<group>";
@@ -128,11 +160,14 @@
 			isa = PBXGroup;
 			children = (
 				20CAD90577B60C2B9F7D30A4 /* Auth */,
+				26861D19AEC4E5FF8418C545 /* Customers */,
 				85CD74F2EFFAECB53B96FBE6 /* Dashboard */,
 				11419C485046203DE5A8DCE0 /* Inventory */,
 				0D41E3342D047D5D6AA5451A /* More */,
 				04E65B1F1407D0FC99E20F3E /* Orders */,
+				65748C30B5E801147748FF93 /* Revenue */,
 				B571E771486E97CEB317F796 /* Root */,
+				DE67E638E36B2DF131D33B89 /* StockIn */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -143,6 +178,15 @@
 				CB43666D331A52E0BEB1B74B /* LoginView.swift */,
 			);
 			path = Auth;
+			sourceTree = "<group>";
+		};
+		26861D19AEC4E5FF8418C545 /* Customers */ = {
+			isa = PBXGroup;
+			children = (
+				A33E6E20519E2E331CFA3A12 /* CustomerDetailView.swift */,
+				79DEEB107F8B90B682AE7F40 /* CustomersView.swift */,
+			);
+			path = Customers;
 			sourceTree = "<group>";
 		};
 		32253B431D7E9F082CABB8FA /* App */ = {
@@ -160,6 +204,14 @@
 				CCCB2B4A842626095E1FEF08 /* AuthStore.swift */,
 			);
 			path = Stores;
+			sourceTree = "<group>";
+		};
+		65748C30B5E801147748FF93 /* Revenue */ = {
+			isa = PBXGroup;
+			children = (
+				DC9F9CEA8150CD200355FD00 /* RevenueView.swift */,
+			);
+			path = Revenue;
 			sourceTree = "<group>";
 		};
 		7D37D8233D948E14AC5BF372 /* Shared */ = {
@@ -222,10 +274,12 @@
 		C3FE8DFB6B4438130B670169 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				DBA29F9415AA6743734EE799 /* CustomerSummary.swift */,
 				81CE24220BC0E093A920641C /* DeliveryRecord.swift */,
 				050D92A5DDF85B932681CAF8 /* Invoice.swift */,
 				DBECF31B32CE01F7CDF54B2A /* Material.swift */,
 				B5D42012D59CCB52BFFF0CDD /* Profile.swift */,
+				4EFB1DC01A3BA446CB0254E0 /* StockIn.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -243,6 +297,15 @@
 				27096A13E2D4869051C7A977 /* Info.plist */,
 			);
 			path = ConstructionMaterials;
+			sourceTree = "<group>";
+		};
+		DE67E638E36B2DF131D33B89 /* StockIn */ = {
+			isa = PBXGroup;
+			children = (
+				18359BE0CC8CCC250C98BCD9 /* StockInFormView.swift */,
+				CAD9ACC7F2C47FC2BD9DBF1A /* StockInListView.swift */,
+			);
+			path = StockIn;
 			sourceTree = "<group>";
 		};
 		E3A1DC37C16120B7A45283E0 = {
@@ -321,10 +384,15 @@
 				7937E185BE8F36FA009BC2A7 /* AuthService.swift in Sources */,
 				8F7C8C8AA274026324C995C7 /* AuthStore.swift in Sources */,
 				2942FA16B9A5A88B0FFBA57D /* ConstructionMaterialsApp.swift in Sources */,
+				CB851910FEDD0A0459BFF24B /* CreateInvoiceView.swift in Sources */,
+				660A0CC6D850F827115566E2 /* CustomerDetailView.swift in Sources */,
+				F0B09680339764BA999862DD /* CustomerSummary.swift in Sources */,
+				F4B65467B236EDBF3450EE3A /* CustomersView.swift in Sources */,
 				7E5AD0FE44BE7C94CC6FFD03 /* DashboardView.swift in Sources */,
 				5EC0EDD18755B0AD8278F1BF /* DeliveryHistoryView.swift in Sources */,
 				9DF3B21B42D36A5B71884C68 /* DeliveryRecord.swift in Sources */,
 				BE3C5FD5E066FF3DD90B2D3A /* DeliverySheet.swift in Sources */,
+				ECB6CB56776E1BB33C6036E1 /* EditInvoiceView.swift in Sources */,
 				5A32CBD2EE74078E87BC619A /* Formatters.swift in Sources */,
 				2477BC96AE18B49D281F9E6E /* InventoryView.swift in Sources */,
 				A265D1EE38516CF679BAD7A3 /* Invoice.swift in Sources */,
@@ -333,16 +401,24 @@
 				CB028013142C93C618AE2142 /* LoginView.swift in Sources */,
 				D95885544C171D6F516E66BA /* MainTabView.swift in Sources */,
 				1784004ED8C9AC8087300537 /* Material.swift in Sources */,
+				FA2F09E4E83D5D404AC1663A /* MaterialFormView.swift in Sources */,
 				B99E30C41994CAC9228A49C4 /* MaterialService.swift in Sources */,
 				E79DDFF931C9F81A435E0197 /* MoreView.swift in Sources */,
 				9AFF627B7E9E018D4A680EB5 /* OrderDetailView.swift in Sources */,
 				A10222467B938069C05C1064 /* OrderRow.swift in Sources */,
 				EB49A97291061CEE8072ABDD /* OrdersView.swift in Sources */,
+				F3EB3B704259C323BBD8C4D8 /* PaymentSheet.swift in Sources */,
 				55A2FC173A4046AA946C2215 /* Profile.swift in Sources */,
+				E5F54CCD575F04B9636D9CA4 /* ProfileEditView.swift in Sources */,
+				A8E34333FB3A02BA191235FF /* RevenueView.swift in Sources */,
 				6C6FBC8854B9E8CBBB880671 /* RootView.swift in Sources */,
 				B06909AFD16D58CF64CA29E3 /* SectionHeader.swift in Sources */,
 				04A97F6248D7D4B89421A21F /* StatusChip.swift in Sources */,
 				D84B69CFBFB30A103C3E627C /* StatusStyles.swift in Sources */,
+				072361D50ADBDDDDF8E03701 /* StockIn.swift in Sources */,
+				DA44D5C36A61A9B789180F69 /* StockInFormView.swift in Sources */,
+				128046C4175D101292874DED /* StockInListView.swift in Sources */,
+				BE3B700393899189D4CE3D2B /* StockInService.swift in Sources */,
 				F0AA90DEF58FAA2D58325990 /* SummaryCard.swift in Sources */,
 				EB91C8AD0F138F8FD5E312AD /* SupabaseManager.swift in Sources */,
 				AC5FF880B53D137CC490727D /* Theme.swift in Sources */,

@@ -2,22 +2,29 @@
 
 App iOS native cho hệ thống quản lý vật liệu xây dựng, dùng chung backend Supabase với bản web.
 
-## Phạm vi hiện tại (MVP)
+## Phạm vi hiện tại
 
 - Đăng nhập bằng username/email + mật khẩu
 - Tổng quan: doanh thu, công nợ, số hóa đơn, vật liệu tồn kho thấp, đơn gần đây
 - Danh sách hóa đơn + tìm kiếm + lọc trạng thái
+- Tạo hóa đơn nhiều mặt hàng, giảm giá, thuế, thanh toán trước
 - Chi tiết hóa đơn:
   - thông tin khách hàng, thanh toán
   - danh sách mặt hàng dạng card
   - công tắc **Chốt giá** từng mặt hàng
   - giao hàng từng phần / giao hết
   - lịch sử giao hàng theo hóa đơn
+- Sửa hóa đơn (giữ số lượng đã giao, không cho giảm dưới mức đã giao)
+- Hủy hóa đơn
+- Ghi nhận thanh toán từng lần
 - Lịch sử giao hàng toàn bộ
-- Danh sách hàng hoá (xem, tìm kiếm)
-- Hồ sơ người dùng + đăng xuất
+- Hàng hoá: xem, tìm kiếm, thêm/sửa vật tư
+- Nhập hàng: tạo phiếu nhập, cộng tồn kho, theo dõi công nợ nhà cung cấp
+- Khách hàng: tổng hợp theo SĐT, công nợ, danh sách hóa đơn
+- Báo cáo doanh thu: 6 tháng gần đây, top vật tư, tình trạng thanh toán
+- Hồ sơ người dùng (sửa họ tên, SĐT, ngân hàng) + đăng xuất
 
-Các phần làm sau: tạo/sửa hóa đơn, thêm/sửa vật tư, nhập hàng, khách hàng, doanh thu nâng cao, phân tích, tra cứu hóa đơn công khai.
+Các phần làm sau: tra cứu hóa đơn công khai, thông báo đẩy, app icon, xuất PDF.
 
 ## Yêu cầu
 
@@ -28,7 +35,6 @@ Các phần làm sau: tạo/sửa hóa đơn, thêm/sửa vật tư, nhập hàn
 ## Chạy app
 
 ```bash
-cd mobile-ios
 xcodegen generate
 open ConstructionMaterials.xcodeproj
 ```
@@ -67,20 +73,22 @@ App tự tìm email từ bảng `profiles` theo username rồi đăng nhập Sup
 ## Cấu trúc code
 
 ```text
-mobile-ios/
   Config/                 # xcconfig + Supabase keys
   project.yml             # XcodeGen project definition
   ConstructionMaterials/
     App/                  # entry point, root view
     Core/                 # config, Supabase, theme, formatters
-    Models/               # Profile, Material, Invoice, DeliveryRecord
-    Services/             # Auth, Invoice, Delivery, Material
+    Models/               # Profile, Material, Invoice, DeliveryRecord, StockIn
+    Services/             # Auth, Invoice, Material, StockIn
     Stores/               # AuthStore
     Features/
       Auth/               # Login
       Dashboard/          # Tổng quan
-      Orders/             # Danh sách, chi tiết, giao hàng, lịch sử
-      Inventory/          # Hàng hoá
+      Orders/             # Danh sách, tạo/sửa, chi tiết, giao hàng, thanh toán
+      Inventory/          # Hàng hoá + form thêm/sửa vật tư
+      StockIn/            # Phiếu nhập hàng
+      Customers/          # Danh sách + chi tiết khách hàng
+      Revenue/            # Báo cáo doanh thu
       More/               # Hồ sơ, lịch sử giao hàng, đăng xuất
     Shared/               # Component dùng chung
 ```
@@ -95,3 +103,5 @@ mobile-ios/
   - bảng `delivery_records` theo `batchId`
   - tồn kho vật tư (chỉ với hóa đơn mới có `stockDeductedAtCreation = false`)
 - Chốt giá: bật → giữ giá gốc; tắt → áp lại giá vật tư hiện tại cho phần còn lại.
+- Khi sửa giá vật tư: phần đã giao giữ nguyên giá/thành tiền, chỉ phần còn lại nhận giá mới; mặt hàng đang chốt giá được bỏ qua.
+- Tồn kho chỉ trừ khi ghi nhận giao hàng; phiếu nhập hàng cộng tồn kho ngay khi lưu.

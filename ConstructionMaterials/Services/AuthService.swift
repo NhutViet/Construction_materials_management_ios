@@ -74,3 +74,36 @@ struct AuthService {
         return profile
     }
 }
+
+private struct ProfileUpdatePayload: Encodable {
+    let fullname: String
+    let phoneNumber: String
+    let bankName: String
+    let bankNumber: String
+}
+
+extension AuthService {
+    func updateProfile(
+        userId: String,
+        fullname: String,
+        phoneNumber: String,
+        bankName: String,
+        bankNumber: String
+    ) async throws -> Profile {
+        let payload = ProfileUpdatePayload(
+            fullname: fullname.trimmingCharacters(in: .whitespacesAndNewlines),
+            phoneNumber: phoneNumber.trimmingCharacters(in: .whitespacesAndNewlines),
+            bankName: bankName.trimmingCharacters(in: .whitespacesAndNewlines),
+            bankNumber: bankNumber.trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+        let profile: Profile = try await client
+            .from("profiles")
+            .update(payload)
+            .eq("id", value: userId)
+            .select()
+            .single()
+            .execute()
+            .value
+        return profile
+    }
+}

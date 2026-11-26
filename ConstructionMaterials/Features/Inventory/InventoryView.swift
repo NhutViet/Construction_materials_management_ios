@@ -5,6 +5,8 @@ struct InventoryView: View {
     @State private var searchText = ""
     @State private var isLoading = true
     @State private var error: String?
+    @State private var showCreate = false
+    @State private var editingMaterial: Material?
 
     private let service = MaterialService()
 
@@ -36,13 +38,19 @@ struct InventoryView: View {
                 } else {
                     LazyVStack(spacing: 12) {
                         ForEach(filteredMaterials) { material in
-                            MaterialRow(material: material)
+                            Button {
+                                editingMaterial = material
+                            } label: {
+                                MaterialRow(material: material)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                 }
             }
             .padding(AppTheme.screenPadding)
         }
+        .contentMargins(.bottom, 80, for: .scrollContent)
         .background(AppTheme.background.ignoresSafeArea())
         .navigationTitle("Hàng hoá")
         .searchable(
@@ -55,11 +63,28 @@ struct InventoryView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
+                    showCreate = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
                     Task { await load() }
                 } label: {
                     Image(systemName: "arrow.clockwise")
                 }
                 .disabled(isLoading)
+            }
+        }
+        .sheet(isPresented: $showCreate) {
+            MaterialFormView(material: nil) { saved in
+                upsert(saved)
+            }
+        }
+        .sheet(item: $editingMaterial) { material in
+            MaterialFormView(material: material) { saved in
+                upsert(saved)
             }
         }
     }
@@ -74,6 +99,15 @@ struct InventoryView: View {
             self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
         isLoading = false
+    }
+
+    @MainActor
+    private func upsert(_ material: Material) {
+        if let index = materials.firstIndex(where: { $0.id == material.id }) {
+            materials[index] = material
+        } else {
+            materials.insert(material, at: 0)
+        }
     }
 }
 

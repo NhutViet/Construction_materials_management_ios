@@ -38,6 +38,93 @@ struct InvoiceItem: Codable {
     }
 
     var shouldDeductStock: Bool { stockDeductedAtCreation == false }
+
+    init(
+        materialId: String?,
+        materialName: String,
+        quantity: Double,
+        unitPrice: Double,
+        totalPrice: Double,
+        unit: String?
+    ) {
+        self.materialId = materialId
+        self.materialName = materialName
+        self.quantity = quantity
+        self.unitPrice = unitPrice
+        self.totalPrice = totalPrice
+        self.unit = unit
+        self.deliveredQuantity = 0
+        self.deliveredAmount = 0
+        self.deliveryStatus = "pending"
+        self.originalUnitPrice = unitPrice
+        self.originalTotalPrice = totalPrice
+        self.stockDeductedAtCreation = false
+    }
+}
+
+struct InvoiceDraftItem: Identifiable {
+    let id = UUID()
+    let material: Material
+    var quantity: Double
+
+    var unitPrice: Double { material.priceValue }
+    var total: Double { roundMoney(unitPrice * quantity) }
+}
+
+struct InvoiceItemInput {
+    let materialId: String?
+    let materialName: String
+    let unit: String?
+    let quantity: Double
+    let unitPrice: Double
+}
+
+struct InvoiceEditableItem: Identifiable {
+    let id = UUID()
+    var materialId: String?
+    var materialName: String
+    var unit: String?
+    var quantity: Double
+    var unitPrice: Double
+    var delivered: Double
+
+    var total: Double { roundMoney(unitPrice * quantity) }
+    var remaining: Double { max(0, quantity - delivered) }
+    var canRemove: Bool { delivered <= 0 }
+
+    var input: InvoiceItemInput {
+        InvoiceItemInput(
+            materialId: materialId,
+            materialName: materialName,
+            unit: unit,
+            quantity: quantity,
+            unitPrice: unitPrice
+        )
+    }
+
+    static func from(invoice: Invoice) -> [InvoiceEditableItem] {
+        invoice.items.map { item in
+            InvoiceEditableItem(
+                materialId: item.materialId,
+                materialName: item.materialName,
+                unit: item.unit,
+                quantity: item.quantity,
+                unitPrice: item.unitPrice,
+                delivered: item.delivered
+            )
+        }
+    }
+
+    static func from(material: Material) -> InvoiceEditableItem {
+        InvoiceEditableItem(
+            materialId: material.id,
+            materialName: material.name,
+            unit: material.unit,
+            quantity: 1,
+            unitPrice: material.priceValue,
+            delivered: 0
+        )
+    }
 }
 
 struct Invoice: Codable, Identifiable {

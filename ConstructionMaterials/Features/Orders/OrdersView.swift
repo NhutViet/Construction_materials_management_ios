@@ -6,6 +6,8 @@ struct OrdersView: View {
     @State private var statusFilter: String?
     @State private var isLoading = true
     @State private var error: String?
+    @State private var showCreate = false
+    @State private var debugInvoiceId: String?
 
     private let service = InvoiceService()
 
@@ -63,6 +65,7 @@ struct OrdersView: View {
             }
             .padding(AppTheme.screenPadding)
         }
+        .contentMargins(.bottom, 80, for: .scrollContent)
         .background(AppTheme.background.ignoresSafeArea())
         .navigationTitle("Đơn hàng")
         .searchable(
@@ -75,12 +78,40 @@ struct OrdersView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
+                    showCreate = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
                     Task { await load() }
                 } label: {
                     Image(systemName: "arrow.clockwise")
                 }
                 .disabled(isLoading)
             }
+        }
+        .sheet(isPresented: $showCreate) {
+            CreateInvoiceView { invoice in
+                invoices.insert(invoice, at: 0)
+                statusFilter = nil
+            }
+        }
+        .navigationDestination(item: $debugInvoiceId) { id in
+            OrderDetailView(invoiceId: id)
+        }
+        .task {
+            #if DEBUG
+            if !invoices.isEmpty, debugInvoiceId == nil,
+               let screen = ProcessInfo.processInfo.environment["IOS_TEST_SCREEN"],
+               ["orderDetail", "editInvoice", "payment", "delivery"].contains(screen) {
+                debugInvoiceId = invoices.first?.id
+            }
+            if ProcessInfo.processInfo.environment["IOS_TEST_SCREEN"] == "createInvoice" {
+                showCreate = true
+            }
+            #endif
         }
     }
 
@@ -120,5 +151,16 @@ struct OrdersView: View {
             self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
         isLoading = false
+        #if DEBUG
+        if let screen = ProcessInfo.processInfo.environment["IOS_TEST_SCREEN"] {
+            if ["orderDetail", "editInvoice", "payment", "delivery"].contains(screen),
+               debugInvoiceId == nil {
+                debugInvoiceId = invoices.first?.id
+            }
+            if screen == "createInvoice" {
+                showCreate = true
+            }
+        }
+        #endif
     }
 }

@@ -96,11 +96,19 @@ struct DashboardView: View {
             }
             .padding(AppTheme.screenPadding)
         }
+        .contentMargins(.bottom, 80, for: .scrollContent)
         .background(AppTheme.background.ignoresSafeArea())
         .navigationTitle("Tổng quan")
         .refreshable { await load() }
         .task { if invoices.isEmpty { await load() } }
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                NavigationLink {
+                    RevenueView()
+                } label: {
+                    Image(systemName: "chart.bar.xaxis")
+                }
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     Task { await load() }

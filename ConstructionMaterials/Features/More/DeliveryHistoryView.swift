@@ -34,6 +34,7 @@ struct DeliveryHistoryView: View {
             }
             .padding(AppTheme.screenPadding)
         }
+        .contentMargins(.bottom, 80, for: .scrollContent)
         .background(AppTheme.background.ignoresSafeArea())
         .navigationTitle("Lịch sử giao hàng")
         .navigationBarTitleDisplayMode(.inline)
