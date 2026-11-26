@@ -45,6 +45,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.nhutviet.constructionmaterials
         PRODUCT_NAME: ConstructionMaterials
+        TARGETED_DEVICE_FAMILY: "1"
     dependencies:
       - package: Supabase
         product: Supabase
