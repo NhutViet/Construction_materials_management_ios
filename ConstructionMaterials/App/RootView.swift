@@ -2,16 +2,39 @@ import SwiftUI
 
 struct RootView: View {
     @EnvironmentObject private var auth: AuthStore
+    @State private var introFinished: Bool = {
+        #if DEBUG
+        return ProcessInfo.processInfo.environment["IOS_TEST_SKIP_INTRO"] == "1"
+        #else
+        return false
+        #endif
+    }()
 
     var body: some View {
-        Group {
-            if auth.isRestoring {
-                SplashView()
-            } else if auth.isAuthenticated {
-                MainTabView()
+        ZStack {
+            if introFinished {
+                appContent
+                    .transition(.opacity)
             } else {
-                LoginView()
+                VideoSplashView {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        introFinished = true
+                    }
+                }
+                .transition(.opacity)
             }
+        }
+        .animation(.easeInOut(duration: 0.4), value: introFinished)
+    }
+
+    @ViewBuilder
+    private var appContent: some View {
+        if auth.isRestoring {
+            SplashView()
+        } else if auth.isAuthenticated {
+            MainTabView()
+        } else {
+            LoginView()
         }
     }
 }

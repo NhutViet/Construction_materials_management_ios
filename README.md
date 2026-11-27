@@ -5,6 +5,7 @@ App iOS native cho hệ thống quản lý vật liệu xây dựng, dùng chung
 ## Phạm vi hiện tại
 
 - Đăng nhập bằng username/email + mật khẩu
+- Video giới thiệu khi mở app (MP4, tự chuyển vào app sau khi hết video, có nút **Bỏ qua**)
 - Tổng quan: doanh thu, công nợ, số hóa đơn, vật liệu tồn kho thấp, đơn gần đây
 - Danh sách hóa đơn + tìm kiếm + lọc trạng thái
 - Tạo hóa đơn nhiều mặt hàng, giảm giá, thuế, thanh toán trước
@@ -84,6 +85,7 @@ App tự tìm email từ bảng `profiles` theo username rồi đăng nhập Sup
     Models/               # Profile, Material, Invoice, DeliveryRecord, StockIn
     Services/             # Auth, Invoice, Material, StockIn
     Stores/               # AuthStore
+    Resources/            # video intro, Assets.xcassets (app icon, launch color)
     Features/
       Auth/               # Login
       Dashboard/          # Tổng quan
@@ -110,3 +112,7 @@ App tự tìm email từ bảng `profiles` theo username rồi đăng nhập Sup
 - Chốt giá: bật → giữ giá gốc; tắt → áp lại giá vật tư hiện tại cho phần còn lại.
 - Khi sửa giá vật tư: phần đã giao giữ nguyên giá/thành tiền, chỉ phần còn lại nhận giá mới; mặt hàng đang chốt giá được bỏ qua.
 - Tồn kho chỉ trừ khi ghi nhận giao hàng; phiếu nhập hàng cộng tồn kho ngay khi lưu.
+- Video intro: `Resources/splash-intro.mp4` (H.264 1280×720, đã bỏ audio, 10 giây), phát bằng `AVPlayer`/`AVPlayerLayer`, tự chuyển vào app khi hết video, có nút Bỏ qua.
+- Dark/Light: màu theme lấy theo `UIColor` dynamic; có lựa chọn Hệ thống/Sáng/Tối trong Cá nhân.
+- App icon lấy từ khung hình video; launch screen dùng màu beige `SplashBackground` để không bị nháy trắng/đen.
+- Khi test nhanh có thể đặt biến môi trường `IOS_TEST_SKIP_INTRO=1` (chỉ Debug) để bỏ qua video.
