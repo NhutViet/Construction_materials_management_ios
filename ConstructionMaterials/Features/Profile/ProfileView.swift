@@ -50,7 +50,7 @@ struct ProfileView: View {
         }
         .task {
             #if DEBUG
-            if ProcessInfo.processInfo.environment["IOS_TEST_SCREEN"] == "profile" {
+            if ProcessInfo.processInfo.environment["IOS_TEST_SCREEN"] == "profileEdit" {
                 showEditProfile = true
             }
             #endif

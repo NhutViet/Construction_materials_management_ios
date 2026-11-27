@@ -3,7 +3,8 @@ import SwiftUI
 struct MainTabView: View {
     @State private var selectedTab: String = {
         let tab = ProcessInfo.processInfo.environment["IOS_TEST_TAB"] ?? "dashboard"
-        return tab == "more" ? "profile" : tab
+        let validTabs = ["dashboard", "orders", "stockIn", "deliveryHistory", "inventory"]
+        return validTabs.contains(tab) ? tab : "dashboard"
     }()
     @State private var showSideMenu = false
     @State private var activeMenuPage: SideMenuPage?
@@ -26,11 +27,11 @@ struct MainTabView: View {
                 .tag("orders")
 
                 NavigationStack {
-                    InventoryView()
+                    StockInListView()
                         .sideMenuToolbar()
                 }
-                .tabItem { Label("Hàng hoá", systemImage: "shippingbox.fill") }
-                .tag("inventory")
+                .tabItem { Label("Nhập hàng", systemImage: "tray.and.arrow.down.fill") }
+                .tag("stockIn")
 
                 NavigationStack {
                     DeliveryHistoryView()
@@ -40,11 +41,11 @@ struct MainTabView: View {
                 .tag("deliveryHistory")
 
                 NavigationStack {
-                    ProfileView()
+                    InventoryView()
                         .sideMenuToolbar()
                 }
-                .tabItem { Label("Cá nhân", systemImage: "person.crop.circle.fill") }
-                .tag("profile")
+                .tabItem { Label("Hàng hoá", systemImage: "shippingbox.fill") }
+                .tag("inventory")
             }
             .tint(AppTheme.primary)
 
@@ -61,7 +62,7 @@ struct MainTabView: View {
                     },
                     onOpenProfile: {
                         closeSideMenu()
-                        selectedTab = "profile"
+                        activeMenuPage = .profile
                     },
                     onClose: closeSideMenu
                 )
@@ -93,8 +94,8 @@ struct MainTabView: View {
             #if DEBUG
             if let screen = ProcessInfo.processInfo.environment["IOS_TEST_SCREEN"] {
                 switch screen {
+                case "profile": activeMenuPage = .profile
                 case "customers": activeMenuPage = .customers
-                case "stockin": activeMenuPage = .stockIn
                 case "revenue": activeMenuPage = .revenue
                 case "sideMenu": showSideMenu = true
                 default: break

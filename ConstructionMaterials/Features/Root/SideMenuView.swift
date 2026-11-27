@@ -1,24 +1,24 @@
 import SwiftUI
 
 enum SideMenuPage: String, CaseIterable, Identifiable {
+    case profile
     case customers
-    case stockIn
     case revenue
 
     var id: String { rawValue }
 
     var title: String {
         switch self {
+        case .profile: return "Cá nhân"
         case .customers: return "Khách hàng"
-        case .stockIn: return "Nhập hàng"
         case .revenue: return "Báo cáo doanh thu"
         }
     }
 
     var icon: String {
         switch self {
+        case .profile: return "person.crop.circle.fill"
         case .customers: return "person.2.fill"
-        case .stockIn: return "tray.and.arrow.down.fill"
         case .revenue: return "chart.line.uptrend.xyaxis"
         }
     }
@@ -26,8 +26,8 @@ enum SideMenuPage: String, CaseIterable, Identifiable {
     @ViewBuilder
     var destination: some View {
         switch self {
+        case .profile: ProfileView()
         case .customers: CustomersView()
-        case .stockIn: StockInListView()
         case .revenue: RevenueView()
         }
     }
@@ -112,45 +112,52 @@ struct SideMenuView: View {
 
     private var menuList: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("QUẢN LÝ")
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 4)
-                    .padding(.top, 16)
-
-                ForEach(SideMenuPage.allCases) { page in
-                    Button {
-                        onSelect(page)
-                    } label: {
-                        HStack(spacing: 12) {
-                            Image(systemName: page.icon)
-                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundStyle(AppTheme.primary)
-                                .frame(width: 36, height: 36)
-                                .background(AppTheme.primary.opacity(0.10))
-                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-
-                            Text(page.title)
-                                .font(.subheadline.weight(.medium))
-                                .foregroundStyle(.primary)
-
-                            Spacer()
-
-                            Image(systemName: "chevron.right")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(.tertiary)
-                        }
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 10)
-                        .background(AppTheme.background)
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    }
-                    .buttonStyle(.plain)
-                }
+            VStack(alignment: .leading, spacing: 20) {
+                menuSection(title: "TÀI KHOẢN", pages: [.profile])
+                menuSection(title: "QUẢN LÝ", pages: [.customers, .revenue])
             }
             .padding(.horizontal, 16)
+            .padding(.top, 16)
             .padding(.bottom, 16)
+        }
+    }
+
+    private func menuSection(title: String, pages: [SideMenuPage]) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 4)
+
+            ForEach(pages) { page in
+                Button {
+                    onSelect(page)
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: page.icon)
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(AppTheme.primary)
+                            .frame(width: 36, height: 36)
+                            .background(AppTheme.primary.opacity(0.10))
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+                        Text(page.title)
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(.primary)
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 10)
+                    .background(AppTheme.background)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+                .buttonStyle(.plain)
+            }
         }
     }
 

@@ -17,11 +17,12 @@ App iOS native cho hệ thống quản lý vật liệu xây dựng, dùng chung
 - Sửa hóa đơn (giữ số lượng đã giao, không cho giảm dưới mức đã giao)
 - Hủy hóa đơn
 - Ghi nhận thanh toán từng lần
+- Thanh tab: **Tổng quan · Đơn hàng · Nhập hàng · Lịch sử · Hàng hoá**
 - Tab **Lịch sử giao hàng** toàn bộ
 - Hàng hoá: xem, tìm kiếm, thêm/sửa vật tư
-- Tab **Cá nhân**: hồ sơ, thông tin liên hệ/ngân hàng, sửa hồ sơ, đăng xuất
-- Menu trái cho các trang phụ: Khách hàng, Nhập hàng, Báo cáo doanh thu
 - Nhập hàng: tạo phiếu nhập, cộng tồn kho, theo dõi công nợ nhà cung cấp
+- Menu trái cho các trang phụ: **Cá nhân**, Khách hàng, Báo cáo doanh thu
+- Cá nhân: hồ sơ, thông tin liên hệ/ngân hàng, sửa hồ sơ, đăng xuất
 - Khách hàng: tổng hợp theo SĐT, công nợ, danh sách hóa đơn
 - Báo cáo doanh thu: 6 tháng gần đây, top vật tư, tình trạng thanh toán
 
