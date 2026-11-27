@@ -17,18 +17,19 @@ App iOS native cho hệ thống quản lý vật liệu xây dựng, dùng chung
 - Sửa hóa đơn (giữ số lượng đã giao, không cho giảm dưới mức đã giao)
 - Hủy hóa đơn
 - Ghi nhận thanh toán từng lần
-- Lịch sử giao hàng toàn bộ
+- Tab **Lịch sử giao hàng** toàn bộ
 - Hàng hoá: xem, tìm kiếm, thêm/sửa vật tư
+- Tab **Cá nhân**: hồ sơ, thông tin liên hệ/ngân hàng, sửa hồ sơ, đăng xuất
+- Menu trái cho các trang phụ: Khách hàng, Nhập hàng, Báo cáo doanh thu
 - Nhập hàng: tạo phiếu nhập, cộng tồn kho, theo dõi công nợ nhà cung cấp
 - Khách hàng: tổng hợp theo SĐT, công nợ, danh sách hóa đơn
 - Báo cáo doanh thu: 6 tháng gần đây, top vật tư, tình trạng thanh toán
-- Hồ sơ người dùng (sửa họ tên, SĐT, ngân hàng) + đăng xuất
 
 Các phần làm sau: tra cứu hóa đơn công khai, thông báo đẩy, app icon, xuất PDF.
 
 ## Yêu cầu
 
-- macOS có **Xcode 16.4+** (máy hiện tại chưa cài Xcode, chỉ có Command Line Tools)
+- macOS có **Xcode 27+** (dùng **Device Hub**, không cần Simulator.app)
 - [XcodeGen](https://github.com/yonaskolb/XcodeGen): `brew install xcodegen`
 - Tài khoản Supabase hiện tại
 
@@ -89,7 +90,9 @@ App tự tìm email từ bảng `profiles` theo username rồi đăng nhập Sup
       StockIn/            # Phiếu nhập hàng
       Customers/          # Danh sách + chi tiết khách hàng
       Revenue/            # Báo cáo doanh thu
-      More/               # Hồ sơ, lịch sử giao hàng, đăng xuất
+      DeliveryHistory/    # Tab lịch sử giao hàng
+      Profile/            # Tab cá nhân + sửa hồ sơ
+      Root/               # Tab bar, menu trái (side menu)
     Shared/               # Component dùng chung
 ```
 

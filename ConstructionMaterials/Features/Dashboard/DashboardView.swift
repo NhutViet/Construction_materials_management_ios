@@ -102,13 +102,6 @@ struct DashboardView: View {
         .refreshable { await load() }
         .task { if invoices.isEmpty { await load() } }
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                NavigationLink {
-                    RevenueView()
-                } label: {
-                    Image(systemName: "chart.bar.xaxis")
-                }
-            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     Task { await load() }
