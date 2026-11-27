@@ -1,6 +1,11 @@
 import Foundation
 import Supabase
 
+extension Notification.Name {
+    /// Phát ra khi phiên đăng nhập không còn hợp lệ để AuthStore đưa người dùng về màn hình đăng nhập.
+    static let authSessionExpired = Notification.Name("ConstructionMaterials.authSessionExpired")
+}
+
 enum AuthServiceError: LocalizedError {
     case invalidCredentials
     case profileNotFound
@@ -26,7 +31,75 @@ struct AuthService {
 
     func restoreProfile() async -> Profile? {
         guard let session = client.auth.currentSession else { return nil }
-        return try? await fetchProfile(userId: session.user.id.uuidString)
+
+        do {
+            // Access token hết hạn nhưng refresh token còn hiệu lực: chủ động làm mới.
+            // Nếu không làm mới, các request đọc bảng chỉ dành cho authenticated
+            // (ví dụ materials) sẽ bị trả về rỗng dù người dùng vẫn thấy giao diện chính.
+            if isExpired(session) {
+                _ = try await client.auth.refreshSession()
+            }
+            let user = try await client.auth.user()
+            return try await fetchProfile(userId: user.id.uuidString)
+        } catch {
+            try? await client.auth.signOut()
+            return nil
+        }
+    }
+
+    /// Kiểm tra nhanh phiên đăng nhập khi app quay lại foreground.
+    /// Chỉ gọi mạng khi access token đã hết hạn để tránh đăng xuất oan khi mất mạng.
+    func validateSessionIfNeeded() async -> Bool {
+        guard let session = client.auth.currentSession else {
+            notifyExpired()
+            return false
+        }
+        guard isExpired(session) else { return true }
+
+        do {
+            _ = try await client.auth.refreshSession()
+            return true
+        } catch {
+            try? await client.auth.signOut()
+            notifyExpired()
+            return false
+        }
+    }
+
+    /// Xác thực mạnh với server. Dùng khi dữ liệu chỉ dành cho authenticated trả về rỗng
+    /// để phân biệt "không có dữ liệu" với "mất phiên đăng nhập".
+    func hasValidSession() async -> Bool {
+        guard let session = client.auth.currentSession else {
+            notifyExpired()
+            return false
+        }
+
+        if isExpired(session) {
+            do {
+                _ = try await client.auth.refreshSession()
+            } catch {
+                try? await client.auth.signOut()
+                notifyExpired()
+                return false
+            }
+        }
+
+        do {
+            _ = try await client.auth.user()
+            return true
+        } catch {
+            try? await client.auth.signOut()
+            notifyExpired()
+            return false
+        }
+    }
+
+    private func isExpired(_ session: Session) -> Bool {
+        session.expiresAt <= Date().addingTimeInterval(30).timeIntervalSince1970
+    }
+
+    private func notifyExpired() {
+        NotificationCenter.default.post(name: .authSessionExpired, object: nil)
     }
 
     func signIn(username: String, password: String) async throws -> Profile {

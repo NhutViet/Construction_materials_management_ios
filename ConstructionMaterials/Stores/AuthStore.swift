@@ -9,6 +9,18 @@ final class AuthStore: ObservableObject {
     @Published var error: String?
 
     private let service = AuthService()
+    private var sessionObserver: AnyCancellable?
+
+    init() {
+        sessionObserver = NotificationCenter.default
+            .publisher(for: .authSessionExpired)
+            .sink { [weak self] _ in
+                Task { @MainActor in
+                    self?.profile = nil
+                    self?.error = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại."
+                }
+            }
+    }
 
     var isAuthenticated: Bool { profile != nil }
 
@@ -37,6 +49,13 @@ final class AuthStore: ObservableObject {
         try? await service.signOut()
         profile = nil
         error = nil
+    }
+
+    func validateSession() async {
+        guard isAuthenticated, !isRestoring else { return }
+        if await service.validateSessionIfNeeded() {
+            await refreshProfile()
+        }
     }
 
     func updateProfile(fullname: String, phoneNumber: String, bankName: String, bankNumber: String) async {

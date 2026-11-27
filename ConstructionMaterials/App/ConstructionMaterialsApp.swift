@@ -3,6 +3,7 @@ import SwiftUI
 @main
 struct ConstructionMaterialsApp: App {
     @StateObject private var auth = AuthStore()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
@@ -19,6 +20,10 @@ struct ConstructionMaterialsApp: App {
                         }
                     }
                     #endif
+                }
+                .onChange(of: scenePhase) { _, newPhase in
+                    guard newPhase == .active else { return }
+                    Task { await auth.validateSession() }
                 }
         }
     }

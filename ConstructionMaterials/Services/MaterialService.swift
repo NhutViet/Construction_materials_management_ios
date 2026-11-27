@@ -21,6 +21,13 @@ struct MaterialService {
             .order("name", ascending: true)
             .execute()
             .value
+
+        // Bảng materials chỉ cho phép người đã đăng nhập đọc. Nếu phiên đăng nhập
+        // không hợp lệ, Supabase trả về mảng rỗng thay vì lỗi, dễ bị hiểu nhầm là
+        // "không có vật liệu". Kiểm tra lại phiên để báo đúng nguyên nhân.
+        if materials.isEmpty, !(await AuthService().hasValidSession()) {
+            throw MaterialServiceError.message("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.")
+        }
         return materials
     }
 
