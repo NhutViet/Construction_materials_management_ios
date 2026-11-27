@@ -4,11 +4,13 @@ import SwiftUI
 struct ConstructionMaterialsApp: App {
     @StateObject private var auth = AuthStore()
     @Environment(\.scenePhase) private var scenePhase
+    @AppStorage("appAppearance") private var appearance = "system"
 
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environmentObject(auth)
+                .preferredColorScheme(preferredColorScheme)
                 .task {
                     await auth.restoreSession()
                     #if DEBUG
@@ -25,6 +27,14 @@ struct ConstructionMaterialsApp: App {
                     guard newPhase == .active else { return }
                     Task { await auth.validateSession() }
                 }
+        }
+    }
+
+    private var preferredColorScheme: ColorScheme? {
+        switch appearance {
+        case "light": return .light
+        case "dark": return .dark
+        default: return nil
         }
     }
 }

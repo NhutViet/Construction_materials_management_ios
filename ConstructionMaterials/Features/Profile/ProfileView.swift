@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject private var auth: AuthStore
+    @AppStorage("appAppearance") private var appearance = "system"
     @State private var showLogoutConfirm = false
     @State private var showEditProfile = false
 
@@ -12,6 +13,9 @@ struct ProfileView: View {
                     profileCard(profile)
                     contactCard(profile)
                 }
+
+                SectionHeader(title: "Giao diện")
+                appearanceCard
 
                 SectionHeader(title: "Thông tin")
                 infoCard
@@ -128,6 +132,22 @@ struct ProfileView: View {
                 title: "Số tài khoản",
                 value: profile.bankNumber?.isEmpty == false ? profile.bankNumber! : "Chưa cập nhật"
             )
+        }
+        .appCard()
+    }
+
+    private var appearanceCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Picker("Giao diện", selection: $appearance) {
+                Text("Hệ thống").tag("system")
+                Text("Sáng").tag("light")
+                Text("Tối").tag("dark")
+            }
+            .pickerStyle(.segmented)
+
+            Text("“Hệ thống” sẽ tự đổi theo cài đặt Light/Dark của iPhone.")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
         }
         .appCard()
     }

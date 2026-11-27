@@ -23,6 +23,7 @@ App iOS native cho hệ thống quản lý vật liệu xây dựng, dùng chung
 - Nhập hàng: tạo phiếu nhập, cộng tồn kho, theo dõi công nợ nhà cung cấp
 - Menu trái cho các trang phụ: **Cá nhân**, Khách hàng, Báo cáo doanh thu
 - Cá nhân: hồ sơ, thông tin liên hệ/ngân hàng, sửa hồ sơ, đăng xuất
+- Giao diện **Light/Dark**: mặc định theo hệ thống, có chọn Hệ thống/Sáng/Tối trong Cá nhân
 - Khách hàng: tổng hợp theo SĐT, công nợ, danh sách hóa đơn
 - Báo cáo doanh thu: 6 tháng gần đây, top vật tư, tình trạng thanh toán
 

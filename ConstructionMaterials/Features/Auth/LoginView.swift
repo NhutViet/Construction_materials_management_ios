@@ -141,9 +141,9 @@ struct LoginView: View {
                             .frame(maxWidth: .infinity, alignment: .center)
                     }
                     .padding(22)
-                    .background(Color.white.opacity(0.97))
+                    .background(AppTheme.card)
                     .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-                    .shadow(color: .black.opacity(0.18), radius: 24, x: 0, y: 12)
+                    .shadow(color: AppTheme.cardShadow, radius: 24, x: 0, y: 12)
 
                     Spacer(minLength: 24)
                 }
