@@ -66,148 +66,196 @@ struct EditInvoiceView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section("Khách hàng") {
-                    TextField("Tên khách hàng *", text: $customerName)
-                    TextField("Số điện thoại", text: $customerPhone)
-                        .keyboardType(.phonePad)
-                    TextField("Địa chỉ", text: $customerAddress, axis: .vertical)
-                        .lineLimit(1...3)
-                }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    FormSection(title: "Khách hàng") {
+                        FormField(
+                            title: "Tên khách hàng *",
+                            placeholder: "Nguyễn Văn A",
+                            icon: "person.fill",
+                            text: $customerName
+                        )
+                        FormField(
+                            title: "Số điện thoại",
+                            placeholder: "09xx xxx xxx",
+                            icon: "phone.fill",
+                            text: $customerPhone,
+                            keyboard: .phonePad
+                        )
+                        FormField(
+                            title: "Địa chỉ",
+                            placeholder: "Địa chỉ giao hàng",
+                            icon: "mappin.and.ellipse",
+                            text: $customerAddress,
+                            axis: .vertical,
+                            lineLimit: 1...3
+                        )
+                    }
 
-                Section("Mặt hàng") {
-                    ForEach($items) { $item in
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                Text(item.materialName)
-                                    .font(.subheadline.weight(.semibold))
-                                Spacer()
-                                Text(Formatters.money(item.total))
-                                    .font(.subheadline.weight(.bold))
-                                    .foregroundStyle(AppTheme.success)
-                            }
-
-                            HStack(spacing: 8) {
-                                Text("SL")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                TextField("0", value: $item.quantity, format: .number)
-                                    .keyboardType(.decimalPad)
-                                    .textFieldStyle(.roundedBorder)
-                                    .frame(width: 80)
-                                Text(item.unit ?? "")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                Spacer()
-                                Text(Formatters.money(item.unitPrice))
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                Button(role: .destructive) {
-                                    items.removeAll { $0.id == item.id }
-                                } label: {
-                                    Image(systemName: "trash")
+                    FormSection(title: "Mặt hàng (\(items.count))") {
+                        ForEach($items) { $item in
+                            VStack(alignment: .leading, spacing: 9) {
+                                HStack {
+                                    Text(item.materialName)
+                                        .font(.subheadline.weight(.semibold))
+                                    Spacer()
+                                    Text(Formatters.money(item.total))
+                                        .font(.subheadline.weight(.bold))
+                                        .foregroundStyle(AppTheme.success)
                                 }
-                                .buttonStyle(.plain)
-                                .disabled(!item.canRemove)
-                            }
 
-                            if item.delivered > 0 {
-                                Text("Đã giao \(Formatters.number(item.delivered)) \(item.unit ?? "") · không thể giảm dưới mức này")
+                                HStack(spacing: 8) {
+                                    Text("SL")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+
+                                    TextField("0", value: $item.quantity, format: .number)
+                                        .font(.subheadline.weight(.medium))
+                                        .keyboardType(.decimalPad)
+                                        .multilineTextAlignment(.trailing)
+                                        .frame(width: 64)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 7)
+                                        .background(AppTheme.background, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+                                    Text(item.unit ?? "")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+
+                                    Spacer()
+
+                                    Text(Formatters.money(item.unitPrice))
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+
+                                    Button {
+                                        items.removeAll { $0.id == item.id }
+                                    } label: {
+                                        Image(systemName: "trash")
+                                            .font(.footnote.weight(.semibold))
+                                            .foregroundStyle(AppTheme.danger)
+                                            .frame(width: 32, height: 32)
+                                            .background(AppTheme.danger.opacity(0.10), in: Circle())
+                                    }
+                                    .buttonStyle(.plain)
+                                    .disabled(!item.canRemove)
+                                    .opacity(item.canRemove ? 1 : 0.35)
+                                }
+
+                                if item.delivered > 0 {
+                                    Label(
+                                        "Đã giao \(Formatters.number(item.delivered)) \(item.unit ?? "") · không thể giảm dưới mức này",
+                                        systemImage: "info.circle"
+                                    )
                                     .font(.caption2)
                                     .foregroundStyle(AppTheme.warning)
+                                }
+                            }
+
+                            if item.id != items.last?.id {
+                                Divider()
                             }
                         }
-                        .padding(.vertical, 4)
-                    }
 
-                    if availableMaterials.isEmpty {
-                        Text("Tất cả vật tư đã có trong hóa đơn.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    } else {
-                        Picker("Thêm vật tư", selection: $selectedMaterialId) {
-                            Text("Chọn vật tư").tag("")
-                            ForEach(availableMaterials) { material in
-                                Text("\(material.name) · \(Formatters.money(material.priceValue))/\(material.unitValue)")
-                                    .tag(material.id)
+                        if availableMaterials.isEmpty {
+                            Text("Tất cả vật tư đã có trong hóa đơn.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        } else {
+                            FormPickerRow(title: "Thêm vật tư") {
+                                Picker("", selection: $selectedMaterialId) {
+                                    Text("Chọn vật tư").tag("")
+                                    ForEach(availableMaterials) { material in
+                                        Text("\(material.name) · \(Formatters.money(material.priceValue))")
+                                            .tag(material.id)
+                                    }
+                                }
+                                .labelsHidden()
+                                .tint(AppTheme.primary)
                             }
+
+                            Button {
+                                addMaterial()
+                            } label: {
+                                Label("Thêm vào hóa đơn", systemImage: "plus.circle.fill")
+                                    .font(.subheadline.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 11)
+                            }
+                            .foregroundStyle(.white)
+                            .background(
+                                selectedMaterialId.isEmpty
+                                    ? Color.gray.opacity(0.4)
+                                    : AppTheme.primary,
+                                in: RoundedRectangle(cornerRadius: 11, style: .continuous)
+                            )
+                            .disabled(selectedMaterialId.isEmpty)
                         }
-                        Button {
-                            addMaterial()
-                        } label: {
-                            Label("Thêm vào hóa đơn", systemImage: "plus.circle")
+                    }
+
+                    FormSection(title: "Thanh toán") {
+                        FormNumberRow(title: "Giảm giá", value: $discountRate, suffix: "%", width: 66)
+                        FormNumberRow(title: "Thuế", value: $taxRate, suffix: "%", width: 66)
+
+                        FormPickerRow(title: "Phương thức") {
+                            Picker("", selection: $paymentMethod) {
+                                Text("Tiền mặt").tag("cash")
+                                Text("Chuyển khoản").tag("online")
+                                Text("Công nợ").tag("debt")
+                            }
+                            .labelsHidden()
+                            .tint(AppTheme.primary)
                         }
-                        .disabled(selectedMaterialId.isEmpty)
                     }
-                }
 
-                Section("Thanh toán") {
-                    HStack {
-                        Text("Giảm giá (%)")
-                        Spacer()
-                        TextField("0", value: $discountRate, format: .number)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 90)
+                    FormSection(title: "Tổng cộng") {
+                        FormTotalRow(title: "Tạm tính", value: Formatters.money(subtotal))
+                        FormTotalRow(title: "Giảm giá", value: "-\(Formatters.money(discountAmount))", color: AppTheme.warning)
+                        FormTotalRow(title: "Thuế", value: Formatters.money(taxAmount))
+                        Divider()
+                        FormTotalRow(title: "Tổng cộng", value: Formatters.money(total), isTotal: true, color: AppTheme.primary)
                     }
-                    HStack {
-                        Text("Thuế (%)")
-                        Spacer()
-                        TextField("0", value: $taxRate, format: .number)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 90)
-                    }
-                    Picker("Phương thức", selection: $paymentMethod) {
-                        Text("Tiền mặt").tag("cash")
-                        Text("Chuyển khoản").tag("online")
-                        Text("Công nợ").tag("debt")
-                    }
-                }
 
-                Section("Tổng") {
-                    LabeledContent("Tạm tính", value: Formatters.money(subtotal))
-                    LabeledContent("Giảm giá", value: "-\(Formatters.money(discountAmount))")
-                    LabeledContent("Thuế", value: Formatters.money(taxAmount))
-                    LabeledContent("Tổng cộng", value: Formatters.money(total))
-                }
+                    FormSection(title: "Giao hàng") {
+                        Toggle("Hẹn ngày giao", isOn: $hasDeliveryDate)
+                            .font(.subheadline)
+                            .tint(AppTheme.primary)
 
-                Section {
-                    Toggle("Hẹn ngày giao", isOn: $hasDeliveryDate)
-                    if hasDeliveryDate {
-                        DatePicker("Ngày giao", selection: $deliveryDate, displayedComponents: [.date])
+                        if hasDeliveryDate {
+                            DatePicker("Ngày giao", selection: $deliveryDate, displayedComponents: [.date])
+                                .font(.subheadline)
+                                .datePickerStyle(.compact)
+                        }
                     }
-                    TextField("Ghi chú", text: $notes, axis: .vertical)
-                        .lineLimit(2...4)
-                }
 
-                if let error {
-                    Section {
-                        Text(error)
-                            .font(.footnote)
-                            .foregroundStyle(AppTheme.danger)
+                    FormSection(title: "Ghi chú") {
+                        FormField(
+                            title: "Ghi chú",
+                            placeholder: "Ghi chú cho hóa đơn (không bắt buộc)",
+                            icon: "text.alignleft",
+                            text: $notes,
+                            axis: .vertical,
+                            lineLimit: 2...4
+                        )
+                    }
+
+                    if let error {
+                        ErrorBanner(message: error)
                     }
                 }
+                .padding(AppTheme.screenPadding)
             }
+            .background(AppTheme.background.ignoresSafeArea())
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle("Sửa hóa đơn")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Hủy") { dismiss() }
-                        .disabled(isSaving)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        save()
-                    } label: {
-                        if isSaving {
-                            ProgressView()
-                        } else {
-                            Text("Lưu")
-                        }
-                    }
-                    .disabled(isSaving || items.isEmpty)
-                }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                FormActionBar(
+                    isSaving: isSaving,
+                    canSave: !items.isEmpty,
+                    onCancel: { dismiss() },
+                    onSave: save
+                )
             }
             .interactiveDismissDisabled(isSaving)
             .task { await loadMaterials() }
@@ -255,7 +303,9 @@ struct EditInvoiceView: View {
                 onSaved(updated)
                 dismiss()
             } catch {
-                self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+                if !error.isCancellation {
+                    self.error = error.userFacingMessage
+                }
             }
             isSaving = false
         }
@@ -266,7 +316,9 @@ struct EditInvoiceView: View {
         do {
             materials = try await materialService.fetchMaterials()
         } catch {
-            self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            if !error.isCancellation {
+                self.error = error.userFacingMessage
+            }
         }
     }
 }

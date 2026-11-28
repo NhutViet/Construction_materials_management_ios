@@ -59,7 +59,20 @@ struct InventoryView: View {
             prompt: "Tìm vật liệu, danh mục, nhà cung cấp"
         )
         .refreshable { await load() }
-        .task { if materials.isEmpty { await load() } }
+        .task {
+            if materials.isEmpty { await load() }
+            #if DEBUG
+            let screen = ProcessInfo.processInfo.environment["IOS_TEST_SCREEN"]
+            if screen == "materialForm" {
+                showCreate = true
+            } else if screen == "materialEdit", let first = materials.first {
+                editingMaterial = first
+            }
+            #endif
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .invoicesDidChange)) { _ in
+            Task { await load() }
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -96,7 +109,9 @@ struct InventoryView: View {
         do {
             materials = try await service.fetchMaterials()
         } catch {
-            self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            if !error.isCancellation {
+                self.error = error.userFacingMessage
+            }
         }
         isLoading = false
     }

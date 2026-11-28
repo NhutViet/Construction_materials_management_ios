@@ -95,6 +95,7 @@ struct MainTabView: View {
             if let screen = ProcessInfo.processInfo.environment["IOS_TEST_SCREEN"] {
                 switch screen {
                 case "profile": activeMenuPage = .profile
+                case "profileEdit": activeMenuPage = .profile
                 case "customers": activeMenuPage = .customers
                 case "revenue": activeMenuPage = .revenue
                 case "sideMenu": showSideMenu = true

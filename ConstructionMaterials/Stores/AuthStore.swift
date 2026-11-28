@@ -39,7 +39,9 @@ final class AuthStore: ObservableObject {
         do {
             profile = try await service.signIn(username: username, password: password)
         } catch {
-            self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            if !error.isCancellation {
+                self.error = error.userFacingMessage
+            }
         }
     }
 
@@ -72,7 +74,9 @@ final class AuthStore: ObservableObject {
                 bankNumber: bankNumber
             )
         } catch {
-            self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            if !error.isCancellation {
+                self.error = error.userFacingMessage
+            }
         }
     }
 

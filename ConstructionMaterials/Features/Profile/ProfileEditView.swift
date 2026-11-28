@@ -20,51 +20,61 @@ struct ProfileEditView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section("Tài khoản") {
-                    LabeledContent("Tên đăng nhập", value: auth.profile?.username ?? "—")
-                    LabeledContent("Email", value: auth.profile?.email ?? "—")
-                }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    FormSection(title: "Tài khoản") {
+                        FormTotalRow(title: "Tên đăng nhập", value: auth.profile?.username ?? "—")
+                        FormTotalRow(title: "Email", value: auth.profile?.email ?? "—")
+                    }
 
-                Section("Thông tin cá nhân") {
-                    TextField("Họ và tên", text: $fullname)
-                    TextField("Số điện thoại", text: $phoneNumber)
-                        .keyboardType(.phonePad)
-                }
+                    FormSection(title: "Thông tin cá nhân") {
+                        FormField(
+                            title: "Họ và tên",
+                            placeholder: "Nguyễn Văn A",
+                            icon: "person.fill",
+                            text: $fullname
+                        )
+                        FormField(
+                            title: "Số điện thoại",
+                            placeholder: "09xx xxx xxx",
+                            icon: "phone.fill",
+                            text: $phoneNumber,
+                            keyboard: .phonePad
+                        )
+                    }
 
-                Section("Thông tin thanh toán") {
-                    TextField("Ngân hàng", text: $bankName)
-                    TextField("Số tài khoản", text: $bankNumber)
-                        .keyboardType(.numberPad)
-                }
+                    FormSection(title: "Thông tin thanh toán") {
+                        FormField(
+                            title: "Ngân hàng",
+                            placeholder: "Tên ngân hàng",
+                            icon: "building.columns.fill",
+                            text: $bankName
+                        )
+                        FormField(
+                            title: "Số tài khoản",
+                            placeholder: "Số tài khoản nhận tiền",
+                            icon: "creditcard.fill",
+                            text: $bankNumber,
+                            keyboard: .numberPad
+                        )
+                    }
 
-                if let error {
-                    Section {
-                        Text(error)
-                            .font(.footnote)
-                            .foregroundStyle(AppTheme.danger)
+                    if let error {
+                        ErrorBanner(message: error)
                     }
                 }
+                .padding(AppTheme.screenPadding)
             }
+            .background(AppTheme.background.ignoresSafeArea())
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle("Sửa hồ sơ")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Hủy") { dismiss() }
-                        .disabled(isSaving)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        save()
-                    } label: {
-                        if isSaving {
-                            ProgressView()
-                        } else {
-                            Text("Lưu")
-                        }
-                    }
-                    .disabled(isSaving)
-                }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                FormActionBar(
+                    isSaving: isSaving,
+                    onCancel: { dismiss() },
+                    onSave: save
+                )
             }
             .interactiveDismissDisabled(isSaving)
         }

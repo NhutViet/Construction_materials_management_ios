@@ -57,6 +57,9 @@ struct CustomerDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .refreshable { await load() }
         .task { if invoices.isEmpty { await load() } }
+        .onReceive(NotificationCenter.default.publisher(for: .invoicesDidChange)) { _ in
+            Task { await load() }
+        }
     }
 
     private func header(_ summary: CustomerSummary) -> some View {
@@ -117,7 +120,9 @@ struct CustomerDetailView: View {
         do {
             invoices = try await service.fetchInvoices()
         } catch {
-            self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            if !error.isCancellation {
+                self.error = error.userFacingMessage
+            }
         }
         isLoading = false
     }

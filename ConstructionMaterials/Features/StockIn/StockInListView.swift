@@ -97,7 +97,9 @@ struct StockInListView: View {
         do {
             stockIns = try await service.fetchStockIns()
         } catch {
-            self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            if !error.isCancellation {
+                self.error = error.userFacingMessage
+            }
         }
         isLoading = false
     }

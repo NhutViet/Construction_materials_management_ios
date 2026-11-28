@@ -21,65 +21,61 @@ struct PaymentSheet: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
-                    LabeledContent("Hóa đơn", value: invoice.invoiceNumber)
-                    LabeledContent("Tổng tiền", value: Formatters.money(invoice.totalValue))
-                    LabeledContent("Đã thanh toán", value: Formatters.money(invoice.paidValue))
-                    LabeledContent("Còn lại", value: Formatters.money(invoice.remainingValue))
-                }
-
-                Section("Thanh toán") {
-                    HStack {
-                        Text("Số tiền")
-                        Spacer()
-                        TextField("0", value: $amount, format: .number)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 140)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    FormSection(title: "Hóa đơn") {
+                        FormTotalRow(title: "Số hóa đơn", value: invoice.invoiceNumber)
+                        FormTotalRow(title: "Tổng tiền", value: Formatters.money(invoice.totalValue))
+                        FormTotalRow(title: "Đã thanh toán", value: Formatters.money(invoice.paidValue), color: AppTheme.success)
+                        Divider()
+                        FormTotalRow(title: "Còn lại", value: Formatters.money(invoice.remainingValue), isTotal: true, color: AppTheme.danger)
                     }
 
-                    Picker("Phương thức", selection: $method) {
-                        Text("Tiền mặt").tag("cash")
-                        Text("Chuyển khoản").tag("online")
-                        Text("Công nợ").tag("debt")
+                    FormSection(title: "Thanh toán") {
+                        FormNumberRow(title: "Số tiền", value: $amount, suffix: "đ", width: 120)
+
+                        FormPickerRow(title: "Phương thức") {
+                            Picker("", selection: $method) {
+                                Text("Tiền mặt").tag("cash")
+                                Text("Chuyển khoản").tag("online")
+                                Text("Công nợ").tag("debt")
+                            }
+                            .labelsHidden()
+                            .tint(AppTheme.primary)
+                        }
+
+                        FormField(
+                            title: "Ghi chú",
+                            placeholder: "Ghi chú thanh toán (không bắt buộc)",
+                            icon: "text.alignleft",
+                            text: $notes,
+                            axis: .vertical,
+                            lineLimit: 2...4
+                        )
                     }
 
-                    TextField("Ghi chú", text: $notes, axis: .vertical)
-                        .lineLimit(2...4)
-                }
-
-                if let error {
-                    Section {
-                        Text(error)
-                            .font(.footnote)
-                            .foregroundStyle(AppTheme.danger)
+                    if let error {
+                        ErrorBanner(message: error)
                     }
                 }
+                .padding(AppTheme.screenPadding)
             }
+            .background(AppTheme.background.ignoresSafeArea())
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle("Thanh toán")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Hủy") { dismiss() }
-                        .disabled(isSaving)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        save()
-                    } label: {
-                        if isSaving {
-                            ProgressView()
-                        } else {
-                            Text("Xác nhận")
-                        }
-                    }
-                    .disabled(isSaving || amount <= 0)
-                }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                FormActionBar(
+                    saveTitle: "Xác nhận",
+                    isSaving: isSaving,
+                    canSave: amount > 0,
+                    onCancel: { dismiss() },
+                    onSave: save
+                )
             }
             .interactiveDismissDisabled(isSaving)
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.large])
     }
 
     private func save() {
@@ -105,7 +101,9 @@ struct PaymentSheet: View {
                 onPaid(updated)
                 dismiss()
             } catch {
-                self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+                if !error.isCancellation {
+                    self.error = error.userFacingMessage
+                }
             }
             isSaving = false
         }

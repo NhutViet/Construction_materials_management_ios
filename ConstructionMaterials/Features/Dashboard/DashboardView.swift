@@ -101,6 +101,9 @@ struct DashboardView: View {
         .navigationTitle("Tổng quan")
         .refreshable { await load() }
         .task { if invoices.isEmpty { await load() } }
+        .onReceive(NotificationCenter.default.publisher(for: .invoicesDidChange)) { _ in
+            Task { await load() }
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -135,7 +138,9 @@ struct DashboardView: View {
             invoices = try await fetchedInvoices
             materials = try await fetchedMaterials
         } catch {
-            self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            if !error.isCancellation {
+                self.error = error.userFacingMessage
+            }
         }
         isLoading = false
     }

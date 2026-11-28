@@ -25,12 +25,45 @@ struct MaterialFormView: View {
     private let service = MaterialService()
     private let invoiceService = InvoiceService()
 
+    private static let categories = [
+        "Vật liệu xây dựng",
+        "Thiết bị điện",
+        "Thiết bị nước",
+        "Vật liệu trang trí",
+        "Công cụ",
+        "An toàn lao động",
+        "Vật liệu nội thất",
+        "Khác"
+    ]
+
+    private static let units = [
+        "viên", "kg", "m", "m²", "m³", "lít", "thùng", "cuộn", "tấm", "bộ", "bao", "cái"
+    ]
+
+    private var categoryOptions: [String] {
+        var options = Self.categories
+        if !category.isEmpty, !options.contains(category) {
+            options.insert(category, at: 0)
+        }
+        return options
+    }
+
+    private var unitOptions: [String] {
+        var options = Self.units
+        if !unit.isEmpty, !options.contains(unit) {
+            options.insert(unit, at: 0)
+        }
+        return options
+    }
+
     init(material: Material?, onSaved: @escaping (Material) -> Void) {
         self.material = material
         self.onSaved = onSaved
+        let initialCategory = material?.category?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let initialUnit = material?.unit?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         _name = State(initialValue: material?.name ?? "")
-        _category = State(initialValue: material?.category ?? "")
-        _unit = State(initialValue: material?.unit ?? "")
+        _category = State(initialValue: initialCategory.isEmpty ? Self.categories[0] : initialCategory)
+        _unit = State(initialValue: initialUnit.isEmpty ? "cái" : initialUnit)
         _price = State(initialValue: material?.priceValue ?? 0)
         _importCost = State(initialValue: material?.importCost ?? 0)
         _quantity = State(initialValue: material?.quantityValue ?? 0)
@@ -43,83 +76,88 @@ struct MaterialFormView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section("Thông tin vật tư") {
-                    TextField("Tên vật tư *", text: $name)
-                    TextField("Danh mục", text: $category)
-                    TextField("Đơn vị", text: $unit)
-                    TextField("Nhà cung cấp", text: $supplier)
-                    TextField("Vị trí kho", text: $location)
-                    TextField("Mô tả", text: $materialDescription, axis: .vertical)
-                        .lineLimit(2...4)
-                }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    FormSection(title: "Thông tin vật tư") {
+                        FormField(
+                            title: "Tên vật tư *",
+                            placeholder: "Ví dụ: Xi măng Hà Tiên",
+                            icon: "shippingbox.fill",
+                            text: $name
+                        )
+                        FormSelectField(
+                            title: "Danh mục",
+                            icon: "square.grid.2x2.fill",
+                            selection: $category,
+                            options: categoryOptions
+                        )
+                        FormSelectField(
+                            title: "Đơn vị",
+                            icon: "ruler.fill",
+                            selection: $unit,
+                            options: unitOptions
+                        )
+                        FormField(
+                            title: "Nhà cung cấp",
+                            placeholder: "Tên nhà cung cấp",
+                            icon: "building.2.fill",
+                            text: $supplier
+                        )
+                        FormField(
+                            title: "Vị trí kho",
+                            placeholder: "Khu A, kệ 2...",
+                            icon: "mappin.and.ellipse",
+                            text: $location
+                        )
+                        FormField(
+                            title: "Mô tả",
+                            placeholder: "Mô tả vật tư (không bắt buộc)",
+                            icon: "text.alignleft",
+                            text: $materialDescription,
+                            axis: .vertical,
+                            lineLimit: 2...4
+                        )
+                    }
 
-                Section("Giá & tồn kho") {
-                    HStack {
-                        Text("Giá nhập")
-                        Spacer()
-                        TextField("0", value: $importCost, format: .number)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 140)
+                    FormSection(title: "Giá & tồn kho") {
+                        FormNumberRow(title: "Giá nhập", value: $importCost, suffix: "đ", width: 120)
+                        FormNumberRow(title: "Giá bán", value: $price, suffix: "đ", width: 120)
+                        FormNumberRow(
+                            title: "Tồn kho",
+                            value: $quantity,
+                            suffix: unit.isEmpty ? nil : unit,
+                            width: 100
+                        )
+                        FormNumberRow(
+                            title: "Tồn tối thiểu",
+                            value: $minStock,
+                            suffix: unit.isEmpty ? nil : unit,
+                            width: 100
+                        )
                     }
-                    HStack {
-                        Text("Giá bán")
-                        Spacer()
-                        TextField("0", value: $price, format: .number)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 140)
-                    }
-                    HStack {
-                        Text("Tồn kho")
-                        Spacer()
-                        TextField("0", value: $quantity, format: .number)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 140)
-                    }
-                    HStack {
-                        Text("Tồn tối thiểu")
-                        Spacer()
-                        TextField("0", value: $minStock, format: .number)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 140)
-                    }
-                }
 
-                Section {
-                    Toggle("Đang hoạt động", isOn: $isActive)
-                }
+                    FormSection(title: "Trạng thái") {
+                        Toggle("Đang hoạt động", isOn: $isActive)
+                            .font(.subheadline)
+                            .tint(AppTheme.primary)
+                    }
 
-                if let error {
-                    Section {
-                        Text(error)
-                            .font(.footnote)
-                            .foregroundStyle(AppTheme.danger)
+                    if let error {
+                        ErrorBanner(message: error)
                     }
                 }
+                .padding(AppTheme.screenPadding)
             }
+            .background(AppTheme.background.ignoresSafeArea())
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle(material == nil ? "Thêm vật tư" : "Sửa vật tư")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Hủy") { dismiss() }
-                        .disabled(isSaving)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        save()
-                    } label: {
-                        if isSaving {
-                            ProgressView()
-                        } else {
-                            Text("Lưu")
-                        }
-                    }
-                    .disabled(isSaving)
-                }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                FormActionBar(
+                    isSaving: isSaving,
+                    onCancel: { dismiss() },
+                    onSave: save
+                )
             }
             .interactiveDismissDisabled(isSaving)
         }
@@ -180,7 +218,9 @@ struct MaterialFormView: View {
                 }
                 dismiss()
             } catch {
-                self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+                if !error.isCancellation {
+                    self.error = error.userFacingMessage
+                }
             }
             isSaving = false
         }

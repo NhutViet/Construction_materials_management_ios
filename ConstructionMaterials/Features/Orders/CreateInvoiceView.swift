@@ -49,163 +49,206 @@ struct CreateInvoiceView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section("Khách hàng") {
-                    TextField("Tên khách hàng *", text: $customerName)
-                    TextField("Số điện thoại", text: $customerPhone)
-                        .keyboardType(.phonePad)
-                    TextField("Địa chỉ", text: $customerAddress, axis: .vertical)
-                        .lineLimit(1...3)
-                }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    FormSection(title: "Khách hàng") {
+                        FormField(
+                            title: "Tên khách hàng *",
+                            placeholder: "Nguyễn Văn A",
+                            icon: "person.fill",
+                            text: $customerName
+                        )
+                        FormField(
+                            title: "Số điện thoại",
+                            placeholder: "09xx xxx xxx",
+                            icon: "phone.fill",
+                            text: $customerPhone,
+                            keyboard: .phonePad
+                        )
+                        FormField(
+                            title: "Địa chỉ",
+                            placeholder: "Địa chỉ giao hàng",
+                            icon: "mappin.and.ellipse",
+                            text: $customerAddress,
+                            axis: .vertical,
+                            lineLimit: 1...3
+                        )
+                    }
 
-                Section("Thêm mặt hàng") {
-                    if isLoading {
-                        ProgressView()
-                    } else if materials.isEmpty {
-                        Text("Chưa có vật liệu.")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        Picker("Vật tư", selection: $selectedMaterialId) {
-                            ForEach(materials) { material in
-                                Text("\(material.name) · \(Formatters.money(material.priceValue))/\(material.unitValue)")
-                                    .tag(material.id)
-                            }
-                        }
-                        HStack {
-                            Text("Số lượng")
-                            Spacer()
-                            TextField("0", value: $quantity, format: .number)
-                                .keyboardType(.decimalPad)
-                                .multilineTextAlignment(.trailing)
-                                .frame(width: 110)
-                            Text(selectedMaterial?.unitValue ?? "")
+                    FormSection(title: "Thêm mặt hàng") {
+                        if isLoading {
+                            ProgressView()
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                        } else if materials.isEmpty {
+                            Text("Chưa có vật liệu. Hãy thêm vật tư trước.")
+                                .font(.footnote)
                                 .foregroundStyle(.secondary)
-                        }
-                        Button {
-                            addDraft()
-                        } label: {
-                            Label("Thêm vào hóa đơn", systemImage: "plus.circle")
-                        }
-                        .disabled(selectedMaterial == nil || quantity <= 0)
-                    }
-                }
-
-                Section("Mặt hàng trong hóa đơn") {
-                    if drafts.isEmpty {
-                        Text("Chưa có mặt hàng.")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        ForEach(drafts.indices, id: \.self) { index in
-                            let draft = drafts[index]
-                            VStack(alignment: .leading, spacing: 6) {
-                                HStack {
-                                    Text(draft.material.name)
-                                        .font(.subheadline.weight(.semibold))
-                                    Spacer()
-                                    Text(Formatters.money(draft.total))
-                                        .font(.subheadline.weight(.bold))
-                                        .foregroundStyle(AppTheme.success)
-                                }
-                                HStack {
-                                    Text("SL")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                    TextField("0", value: $drafts[index].quantity, format: .number)
-                                        .keyboardType(.decimalPad)
-                                        .textFieldStyle(.roundedBorder)
-                                        .frame(width: 90)
-                                    Text(draft.material.unitValue)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                    Spacer()
-                                    Text(Formatters.money(draft.unitPrice))
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                    Button(role: .destructive) {
-                                        drafts.remove(at: index)
-                                    } label: {
-                                        Image(systemName: "trash")
+                        } else {
+                            FormPickerRow(title: "Vật tư") {
+                                Picker("", selection: $selectedMaterialId) {
+                                    ForEach(materials) { material in
+                                        Text("\(material.name) · \(Formatters.money(material.priceValue))")
+                                            .tag(material.id)
                                     }
-                                    .buttonStyle(.plain)
+                                }
+                                .labelsHidden()
+                                .tint(AppTheme.primary)
+                            }
+
+                            if let material = selectedMaterial {
+                                HStack {
+                                    Text("Giá bán")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                    Spacer()
+                                    Text("\(Formatters.money(material.priceValue)) / \(material.unitValue)")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(AppTheme.primary)
                                 }
                             }
-                            .padding(.vertical, 4)
+
+                            FormNumberRow(
+                                title: "Số lượng",
+                                value: $quantity,
+                                suffix: selectedMaterial?.unitValue,
+                                width: 88
+                            )
+
+                            Button {
+                                addDraft()
+                            } label: {
+                                Label("Thêm vào hóa đơn", systemImage: "plus.circle.fill")
+                                    .font(.subheadline.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 11)
+                            }
+                            .foregroundStyle(.white)
+                            .background(
+                                selectedMaterial != nil && quantity > 0
+                                    ? AppTheme.primary
+                                    : Color.gray.opacity(0.4),
+                                in: RoundedRectangle(cornerRadius: 11, style: .continuous)
+                            )
+                            .disabled(selectedMaterial == nil || quantity <= 0)
                         }
                     }
-                }
 
-                Section("Thanh toán") {
-                    HStack {
-                        Text("Giảm giá (%)")
-                        Spacer()
-                        TextField("0", value: $discountRate, format: .number)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 90)
-                    }
-                    HStack {
-                        Text("Thuế (%)")
-                        Spacer()
-                        TextField("0", value: $taxRate, format: .number)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 90)
-                    }
-                    Picker("Phương thức", selection: $paymentMethod) {
-                        Text("Tiền mặt").tag("cash")
-                        Text("Chuyển khoản").tag("online")
-                        Text("Công nợ").tag("debt")
-                    }
-                    HStack {
-                        Text("Đã thanh toán")
-                        Spacer()
-                        TextField("0", value: $paidAmount, format: .number)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(width: 120)
-                    }
-                }
+                    FormSection(title: "Mặt hàng trong hóa đơn (\(drafts.count))") {
+                        if drafts.isEmpty {
+                            Text("Chưa có mặt hàng nào.")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        } else {
+                            ForEach($drafts) { $draft in
+                                VStack(alignment: .leading, spacing: 9) {
+                                    HStack {
+                                        Text(draft.material.name)
+                                            .font(.subheadline.weight(.semibold))
+                                        Spacer()
+                                        Text(Formatters.money(draft.total))
+                                            .font(.subheadline.weight(.bold))
+                                            .foregroundStyle(AppTheme.success)
+                                    }
 
-                Section("Tổng") {
-                    LabeledContent("Tạm tính", value: Formatters.money(subtotal))
-                    LabeledContent("Giảm giá", value: "-\(Formatters.money(discountAmount))")
-                    LabeledContent("Thuế", value: Formatters.money(taxAmount))
-                    LabeledContent("Tổng cộng", value: Formatters.money(total))
-                    LabeledContent("Còn lại", value: Formatters.money(max(0, total - paidAmount)))
-                }
+                                    HStack(spacing: 8) {
+                                        Text("SL")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
 
-                Section("Ghi chú") {
-                    TextField("Ghi chú", text: $notes, axis: .vertical)
-                        .lineLimit(2...4)
-                }
+                                        TextField("0", value: $draft.quantity, format: .number)
+                                            .font(.subheadline.weight(.medium))
+                                            .keyboardType(.decimalPad)
+                                            .multilineTextAlignment(.trailing)
+                                            .frame(width: 64)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 7)
+                                            .background(AppTheme.background, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-                if let error {
-                    Section {
-                        Text(error)
-                            .font(.footnote)
-                            .foregroundStyle(AppTheme.danger)
+                                        Text(draft.material.unitValue)
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+
+                                        Spacer()
+
+                                        Text(Formatters.money(draft.unitPrice))
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+
+                                        Button {
+                                            drafts.removeAll { $0.id == draft.id }
+                                        } label: {
+                                            Image(systemName: "trash")
+                                                .font(.footnote.weight(.semibold))
+                                                .foregroundStyle(AppTheme.danger)
+                                                .frame(width: 32, height: 32)
+                                                .background(AppTheme.danger.opacity(0.10), in: Circle())
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                }
+
+                                if draft.id != drafts.last?.id {
+                                    Divider()
+                                }
+                            }
+                        }
+                    }
+
+                    FormSection(title: "Thanh toán") {
+                        FormNumberRow(title: "Giảm giá", value: $discountRate, suffix: "%", width: 66)
+                        FormNumberRow(title: "Thuế", value: $taxRate, suffix: "%", width: 66)
+
+                        FormPickerRow(title: "Phương thức") {
+                            Picker("", selection: $paymentMethod) {
+                                Text("Tiền mặt").tag("cash")
+                                Text("Chuyển khoản").tag("online")
+                                Text("Công nợ").tag("debt")
+                            }
+                            .labelsHidden()
+                            .tint(AppTheme.primary)
+                        }
+
+                        FormNumberRow(title: "Đã thanh toán", value: $paidAmount, suffix: "đ", width: 108)
+                    }
+
+                    FormSection(title: "Tổng cộng") {
+                        FormTotalRow(title: "Tạm tính", value: Formatters.money(subtotal))
+                        FormTotalRow(title: "Giảm giá", value: "-\(Formatters.money(discountAmount))", color: AppTheme.warning)
+                        FormTotalRow(title: "Thuế", value: Formatters.money(taxAmount))
+                        Divider()
+                        FormTotalRow(title: "Tổng cộng", value: Formatters.money(total), isTotal: true, color: AppTheme.primary)
+                        FormTotalRow(title: "Còn lại", value: Formatters.money(max(0, total - paidAmount)), color: AppTheme.danger)
+                    }
+
+                    FormSection(title: "Ghi chú") {
+                        FormField(
+                            title: "Ghi chú",
+                            placeholder: "Ghi chú cho hóa đơn (không bắt buộc)",
+                            icon: "text.alignleft",
+                            text: $notes,
+                            axis: .vertical,
+                            lineLimit: 2...4
+                        )
+                    }
+
+                    if let error {
+                        ErrorBanner(message: error)
                     }
                 }
+                .padding(AppTheme.screenPadding)
             }
+            .background(AppTheme.background.ignoresSafeArea())
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle("Tạo hóa đơn")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Hủy") { dismiss() }
-                        .disabled(isSaving)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        save()
-                    } label: {
-                        if isSaving {
-                            ProgressView()
-                        } else {
-                            Text("Lưu")
-                        }
-                    }
-                    .disabled(isSaving || drafts.isEmpty)
-                }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                FormActionBar(
+                    isSaving: isSaving,
+                    canSave: !drafts.isEmpty,
+                    onCancel: { dismiss() },
+                    onSave: save
+                )
             }
             .interactiveDismissDisabled(isSaving)
             .task { await loadMaterials() }
@@ -249,9 +292,12 @@ struct CreateInvoiceView: View {
                     profile: profile
                 )
                 onCreated(invoice)
+                NotificationCenter.default.post(name: .invoicesDidChange, object: nil)
                 dismiss()
             } catch {
-                self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+                if !error.isCancellation {
+                    self.error = error.userFacingMessage
+                }
             }
             isSaving = false
         }
@@ -266,7 +312,9 @@ struct CreateInvoiceView: View {
                 selectedMaterialId = first.id
             }
         } catch {
-            self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            if !error.isCancellation {
+                self.error = error.userFacingMessage
+            }
         }
         isLoading = false
     }

@@ -40,6 +40,9 @@ struct DeliveryHistoryView: View {
         .navigationBarTitleDisplayMode(.inline)
         .refreshable { await load() }
         .task { if records.isEmpty { await load() } }
+        .onReceive(NotificationCenter.default.publisher(for: .invoicesDidChange)) { _ in
+            Task { await load() }
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -59,7 +62,9 @@ struct DeliveryHistoryView: View {
         do {
             records = try await service.fetchAllDeliveryRecords()
         } catch {
-            self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            if !error.isCancellation {
+                self.error = error.userFacingMessage
+            }
         }
         isLoading = false
     }

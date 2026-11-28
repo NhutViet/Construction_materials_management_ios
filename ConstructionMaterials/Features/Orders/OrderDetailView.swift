@@ -47,44 +47,30 @@ struct OrderDetailView: View {
         .background(AppTheme.background.ignoresSafeArea())
         .navigationTitle(invoice?.invoiceNumber ?? "Chi tiết")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
         .refreshable { await load() }
         .task { await load() }
-        .toolbar {
+        .safeAreaInset(edge: .bottom, spacing: 0) {
             if let invoice {
-                if invoice.canDeliver {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button {
-                            showDeliverySheet = true
-                        } label: {
-                            Label("Giao hàng", systemImage: "shippingbox.fill")
-                        }
-                    }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Button {
-                            showEditSheet = true
-                        } label: {
-                            Label("Sửa hóa đơn", systemImage: "pencil")
-                        }
-
-                        if !invoice.isCancelled {
-                            Button(role: .destructive) {
-                                showCancelConfirm = true
-                            } label: {
-                                Label("Hủy hóa đơn", systemImage: "xmark.circle")
-                            }
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                    }
-                }
+                OrderActionBar(
+                    canDeliver: invoice.canDeliver,
+                    canPay: invoice.remainingValue > 0 && !invoice.isCancelled,
+                    isCancelled: invoice.isCancelled,
+                    onDeliver: { showDeliverySheet = true },
+                    onPay: { showPaymentSheet = true },
+                    onEdit: { showEditSheet = true },
+                    onCancel: { showCancelConfirm = true }
+                )
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(AppTheme.background.ignoresSafeArea(edges: .bottom))
             }
         }
         .sheet(isPresented: $showDeliverySheet) {
             if let invoice, let profile = auth.profile {
                 DeliverySheet(invoice: invoice, profile: profile) { updated in
                     self.invoice = updated
+                    notifyInvoiceChanged()
                     Task { await loadRecords() }
                 }
             }
@@ -93,6 +79,7 @@ struct OrderDetailView: View {
             if let invoice {
                 PaymentSheet(invoice: invoice) { updated in
                     self.invoice = updated
+                    notifyInvoiceChanged()
                 }
             }
         }
@@ -100,6 +87,7 @@ struct OrderDetailView: View {
             if let invoice {
                 EditInvoiceView(invoice: invoice) { updated in
                     self.invoice = updated
+                    notifyInvoiceChanged()
                 }
             }
         }
@@ -154,16 +142,6 @@ struct OrderDetailView: View {
                 DetailMetric(title: "Còn lại", value: Formatters.money(invoice.remainingValue), color: AppTheme.danger)
                 DetailMetric(title: "Đã giao", value: Formatters.money(invoice.items.reduce(0) { $0 + ($1.deliveredAmount ?? 0) }), color: AppTheme.info)
             }
-
-            if invoice.remainingValue > 0 && !invoice.isCancelled {
-                Button {
-                    showPaymentSheet = true
-                } label: {
-                    Label("Thanh toán", systemImage: "creditcard.fill")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-            }
         }
         .appCard()
     }
@@ -213,7 +191,9 @@ struct OrderDetailView: View {
             invoice = try await invoiceTask
             records = try await recordsTask
         } catch {
-            self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            if !error.isCancellation {
+                self.error = error.userFacingMessage
+            }
         }
         isLoading = false
         #if DEBUG
@@ -247,8 +227,11 @@ struct OrderDetailView: View {
                 itemIndex: index,
                 locked: locked
             )
+            notifyInvoiceChanged()
         } catch {
-            self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            if !error.isCancellation {
+                self.error = error.userFacingMessage
+            }
         }
         busyItemIndex = nil
     }
@@ -259,9 +242,16 @@ struct OrderDetailView: View {
         error = nil
         do {
             self.invoice = try await service.updateStatus(invoice: invoice, status: "cancelled")
+            notifyInvoiceChanged()
         } catch {
-            self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            if !error.isCancellation {
+                self.error = error.userFacingMessage
+            }
         }
+    }
+
+    private func notifyInvoiceChanged() {
+        NotificationCenter.default.post(name: .invoicesDidChange, object: nil)
     }
 }
 

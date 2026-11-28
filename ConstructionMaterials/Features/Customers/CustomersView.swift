@@ -82,6 +82,9 @@ struct CustomersView: View {
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Tìm tên, SĐT, địa chỉ")
         .refreshable { await load() }
         .task { if invoices.isEmpty { await load() } }
+        .onReceive(NotificationCenter.default.publisher(for: .invoicesDidChange)) { _ in
+            Task { await load() }
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -101,7 +104,9 @@ struct CustomersView: View {
         do {
             invoices = try await service.fetchInvoices()
         } catch {
-            self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            if !error.isCancellation {
+                self.error = error.userFacingMessage
+            }
         }
         isLoading = false
     }

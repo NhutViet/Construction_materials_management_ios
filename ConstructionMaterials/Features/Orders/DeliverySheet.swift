@@ -29,93 +29,129 @@ struct DeliverySheet: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(invoice.invoiceNumber)
-                            .font(.headline)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text(invoice.invoiceNumber)
+                                .font(.headline)
+                            Spacer()
+                            StatusChip(
+                                text: InvoiceStatus.text(invoice.status),
+                                color: InvoiceStatus.color(invoice.status)
+                            )
+                        }
                         Text(invoice.customerName)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
-                }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .appCard()
 
-                Section("Số lượng giao") {
-                    if remainingItems.isEmpty {
-                        Text("Hóa đơn đã giao đủ.")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        ForEach(remainingItems, id: \.index) { entry in
-                            HStack(spacing: 10) {
-                                VStack(alignment: .leading, spacing: 3) {
-                                    Text(entry.item.materialName)
+                    FormSection(title: "Số lượng giao") {
+                        if remainingItems.isEmpty {
+                            Text("Hóa đơn đã giao đủ.")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        } else {
+                            ForEach(remainingItems, id: \.index) { entry in
+                                VStack(alignment: .leading, spacing: 9) {
+                                    HStack {
+                                        Text(entry.item.materialName)
+                                            .font(.subheadline.weight(.semibold))
+                                        Spacer()
+                                        Text("Còn \(Formatters.number(entry.item.remaining)) \(entry.item.unitValue)")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+
+                                    HStack(spacing: 8) {
+                                        Text("Giao")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+
+                                        TextField("0", text: Binding(
+                                            get: { quantities[entry.index] ?? "" },
+                                            set: { quantities[entry.index] = $0 }
+                                        ))
                                         .font(.subheadline.weight(.semibold))
-                                    Text("Còn \(Formatters.number(entry.item.remaining)) \(entry.item.unitValue)")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .keyboardType(.decimalPad)
+                                        .multilineTextAlignment(.trailing)
+                                        .frame(width: 76)
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 9)
+                                        .background(AppTheme.background, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                                        .disabled(isSaving)
+
+                                        Text(entry.item.unitValue)
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+
+                                        Spacer()
+                                    }
                                 }
-                                Spacer()
-                                TextField("0", text: Binding(
-                                    get: { quantities[entry.index] ?? "" },
-                                    set: { quantities[entry.index] = $0 }
-                                ))
-                                .keyboardType(.decimalPad)
-                                .multilineTextAlignment(.trailing)
-                                .frame(width: 88)
-                                .disabled(isSaving)
-                                Text(entry.item.unitValue)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+
+                                if entry.index != remainingItems.last?.index {
+                                    Divider()
+                                }
                             }
-                            .padding(.vertical, 2)
-                        }
 
-                        Button {
-                            fillAll()
-                        } label: {
-                            Label("Giao tất cả phần còn lại", systemImage: "checkmark.circle")
+                            Button {
+                                fillAll()
+                            } label: {
+                                Label("Giao tất cả phần còn lại", systemImage: "checkmark.circle.fill")
+                                    .font(.subheadline.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                            }
+                            .foregroundStyle(AppTheme.primary)
+                            .background(
+                                AppTheme.primary.opacity(0.10),
+                                in: RoundedRectangle(cornerRadius: 11, style: .continuous)
+                            )
+                            .disabled(isSaving || remainingItems.isEmpty)
                         }
-                        .disabled(isSaving || remainingItems.isEmpty)
+                    }
+
+                    FormSection(title: "Thời điểm giao") {
+                        DatePicker(
+                            "Thời điểm giao",
+                            selection: $deliveredAt,
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
+                        .font(.subheadline)
+                        .datePickerStyle(.compact)
+                    }
+
+                    FormSection(title: "Ghi chú") {
+                        FormField(
+                            title: "Ghi chú",
+                            placeholder: "Ghi chú cho đợt giao (không bắt buộc)",
+                            icon: "text.alignleft",
+                            text: $notes,
+                            axis: .vertical,
+                            lineLimit: 2...4
+                        )
+                    }
+
+                    if let error {
+                        ErrorBanner(message: error)
                     }
                 }
-
-                Section {
-                    DatePicker(
-                        "Thời điểm giao",
-                        selection: $deliveredAt,
-                        displayedComponents: [.date, .hourAndMinute]
-                    )
-                    TextField("Ghi chú (không bắt buộc)", text: $notes, axis: .vertical)
-                        .lineLimit(2...4)
-                }
-
-                if let error {
-                    Section {
-                        Text(error)
-                            .font(.footnote)
-                            .foregroundStyle(AppTheme.danger)
-                    }
-                }
+                .padding(AppTheme.screenPadding)
             }
+            .background(AppTheme.background.ignoresSafeArea())
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle("Giao hàng")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Hủy") { dismiss() }
-                        .disabled(isSaving)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        submit()
-                    } label: {
-                        if isSaving {
-                            ProgressView()
-                        } else {
-                            Text("Xác nhận")
-                        }
-                    }
-                    .disabled(isSaving || selectedQuantityCount == 0)
-                }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                FormActionBar(
+                    saveTitle: "Xác nhận",
+                    isSaving: isSaving,
+                    canSave: selectedQuantityCount > 0,
+                    onCancel: { dismiss() },
+                    onSave: submit
+                )
             }
             .interactiveDismissDisabled(isSaving)
             .onAppear {
@@ -180,7 +216,9 @@ struct DeliverySheet: View {
                 onDelivered(updated)
                 dismiss()
             } catch {
-                self.error = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+                if !error.isCancellation {
+                    self.error = error.userFacingMessage
+                }
             }
             isSaving = false
         }
