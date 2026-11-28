@@ -55,6 +55,50 @@ struct MaterialService {
             .eq("_id", value: id)
             .execute()
     }
+
+    /// Cập nhật tồn kho và giá nhập gần nhất trong cùng một request.
+    func updateStock(id: String, quantity: Double, importCost: Double) async throws {
+        struct Payload: Encodable {
+            let quantity: Double
+            let importCost: Double
+            let updatedAt: String
+        }
+        let payload = Payload(
+            quantity: max(0, roundMoney(quantity)),
+            importCost: max(0, roundMoney(importCost)),
+            updatedAt: Formatters.nowIso()
+        )
+        _ = try await client
+            .from("materials")
+            .update(payload)
+            .eq("_id", value: id)
+            .execute()
+    }
+
+    /// Chỉ dùng để dọn vật tư vừa tạo khi lưu phiếu nhập thất bại.
+    func deleteMaterial(id: String) async throws {
+        _ = try await client
+            .from("materials")
+            .delete()
+            .eq("_id", value: id)
+            .execute()
+    }
+
+    func updateImportCost(id: String, importCost: Double) async throws {
+        struct Payload: Encodable {
+            let importCost: Double
+            let updatedAt: String
+        }
+        let payload = Payload(
+            importCost: max(0, roundMoney(importCost)),
+            updatedAt: Formatters.nowIso()
+        )
+        _ = try await client
+            .from("materials")
+            .update(payload)
+            .eq("_id", value: id)
+            .execute()
+    }
 }
 
 private struct MaterialCreatePayload: Encodable {

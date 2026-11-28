@@ -5,6 +5,7 @@ struct StockInListView: View {
     @State private var isLoading = true
     @State private var error: String?
     @State private var showCreate = false
+    @State private var debugStockInId: String?
 
     private let service = StockInService()
 
@@ -53,7 +54,12 @@ struct StockInListView: View {
                 } else {
                     LazyVStack(spacing: 12) {
                         ForEach(stockIns) { stockIn in
-                            StockInCard(stockIn: stockIn)
+                            NavigationLink {
+                                StockInDetailView(stockInId: stockIn.id)
+                            } label: {
+                                StockInCard(stockIn: stockIn)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                 }
@@ -65,7 +71,17 @@ struct StockInListView: View {
         .navigationTitle("Nhập hàng")
         .navigationBarTitleDisplayMode(.inline)
         .refreshable { await load() }
-        .task { if stockIns.isEmpty { await load() } }
+        .task {
+            if stockIns.isEmpty { await load() }
+            #if DEBUG
+            let screen = ProcessInfo.processInfo.environment["IOS_TEST_SCREEN"]
+            if screen == "stockInForm" {
+                showCreate = true
+            } else if (screen == "stockInDetail" || screen == "stockInEdit"), debugStockInId == nil {
+                debugStockInId = stockIns.first?.id
+            }
+            #endif
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -87,6 +103,12 @@ struct StockInListView: View {
             StockInFormView { created in
                 stockIns.insert(created, at: 0)
             }
+        }
+        .navigationDestination(item: $debugStockInId) { id in
+            StockInDetailView(stockInId: id)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .stockInsDidChange)) { _ in
+            Task { await load() }
         }
     }
 
@@ -139,7 +161,12 @@ private struct StockInCard: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
-                StatusChip(text: paymentText, color: paymentColor)
+                HStack(spacing: 6) {
+                    StatusChip(text: paymentText, color: paymentColor)
+                    Image(systemName: "chevron.right")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(.tertiary)
+                }
             }
 
             HStack {

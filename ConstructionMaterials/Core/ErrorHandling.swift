@@ -3,6 +3,12 @@ import Foundation
 extension Notification.Name {
     /// Phát ra sau khi hóa đơn thay đổi (tạo, sửa, giao hàng, thanh toán, chốt giá, hủy).
     static let invoicesDidChange = Notification.Name("ConstructionMaterials.invoicesDidChange")
+
+    /// Phát ra sau khi danh sách/tồn kho vật tư thay đổi.
+    static let materialsDidChange = Notification.Name("ConstructionMaterials.materialsDidChange")
+
+    /// Phát ra sau khi phiếu nhập được tạo, sửa hoặc xoá.
+    static let stockInsDidChange = Notification.Name("ConstructionMaterials.stockInsDidChange")
 }
 
 extension Error {

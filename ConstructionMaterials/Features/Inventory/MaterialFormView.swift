@@ -25,23 +25,8 @@ struct MaterialFormView: View {
     private let service = MaterialService()
     private let invoiceService = InvoiceService()
 
-    private static let categories = [
-        "Vật liệu xây dựng",
-        "Thiết bị điện",
-        "Thiết bị nước",
-        "Vật liệu trang trí",
-        "Công cụ",
-        "An toàn lao động",
-        "Vật liệu nội thất",
-        "Khác"
-    ]
-
-    private static let units = [
-        "viên", "kg", "m", "m²", "m³", "lít", "thùng", "cuộn", "tấm", "bộ", "bao", "cái"
-    ]
-
     private var categoryOptions: [String] {
-        var options = Self.categories
+        var options = MaterialOptions.categories
         if !category.isEmpty, !options.contains(category) {
             options.insert(category, at: 0)
         }
@@ -49,7 +34,7 @@ struct MaterialFormView: View {
     }
 
     private var unitOptions: [String] {
-        var options = Self.units
+        var options = MaterialOptions.units
         if !unit.isEmpty, !options.contains(unit) {
             options.insert(unit, at: 0)
         }
@@ -62,7 +47,7 @@ struct MaterialFormView: View {
         let initialCategory = material?.category?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         let initialUnit = material?.unit?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         _name = State(initialValue: material?.name ?? "")
-        _category = State(initialValue: initialCategory.isEmpty ? Self.categories[0] : initialCategory)
+        _category = State(initialValue: initialCategory.isEmpty ? MaterialOptions.categories[0] : initialCategory)
         _unit = State(initialValue: initialUnit.isEmpty ? "cái" : initialUnit)
         _price = State(initialValue: material?.priceValue ?? 0)
         _importCost = State(initialValue: material?.importCost ?? 0)
@@ -198,6 +183,7 @@ struct MaterialFormView: View {
                         )
                     }
                     onSaved(updated)
+                    NotificationCenter.default.post(name: .materialsDidChange, object: nil)
                 } else if let profile = auth.profile {
                     let created = try await service.createMaterial(
                         name: name,
@@ -215,6 +201,7 @@ struct MaterialFormView: View {
                         profile: profile
                     )
                     onSaved(created)
+                    NotificationCenter.default.post(name: .materialsDidChange, object: nil)
                 }
                 dismiss()
             } catch {

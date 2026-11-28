@@ -60,7 +60,7 @@ struct EditInvoiceView: View {
 
     private var availableMaterials: [Material] {
         materials.filter { material in
-            !items.contains { $0.materialId == material.id }
+            material.isAvailable && !items.contains { $0.materialId == material.id }
         }
     }
 

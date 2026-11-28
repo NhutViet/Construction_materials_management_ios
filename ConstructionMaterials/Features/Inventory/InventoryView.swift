@@ -73,6 +73,9 @@ struct InventoryView: View {
         .onReceive(NotificationCenter.default.publisher(for: .invoicesDidChange)) { _ in
             Task { await load() }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .materialsDidChange)) { _ in
+            Task { await load() }
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -140,7 +143,9 @@ private struct MaterialRow: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
-                if material.isLowStock {
+                if material.isInactive {
+                    StatusChip(text: "Ngừng hoạt động", color: AppTheme.muted)
+                } else if material.isLowStock {
                     StatusChip(text: "Tồn kho thấp", color: AppTheme.warning)
                 }
             }

@@ -27,8 +27,12 @@ struct CreateInvoiceView: View {
     private let materialService = MaterialService()
     private let invoiceService = InvoiceService()
 
+    private var activeMaterials: [Material] {
+        materials.filter(\.isAvailable)
+    }
+
     private var selectedMaterial: Material? {
-        materials.first { $0.id == selectedMaterialId }
+        activeMaterials.first { $0.id == selectedMaterialId }
     }
 
     private var subtotal: Double {
@@ -80,14 +84,14 @@ struct CreateInvoiceView: View {
                             ProgressView()
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 8)
-                        } else if materials.isEmpty {
-                            Text("Chưa có vật liệu. Hãy thêm vật tư trước.")
+                        } else if activeMaterials.isEmpty {
+                            Text("Chưa có vật tư đang hoạt động.")
                                 .font(.footnote)
                                 .foregroundStyle(.secondary)
                         } else {
                             FormPickerRow(title: "Vật tư") {
                                 Picker("", selection: $selectedMaterialId) {
-                                    ForEach(materials) { material in
+                                    ForEach(activeMaterials) { material in
                                         Text("\(material.name) · \(Formatters.money(material.priceValue))")
                                             .tag(material.id)
                                     }
@@ -308,7 +312,7 @@ struct CreateInvoiceView: View {
         isLoading = true
         do {
             materials = try await materialService.fetchMaterials()
-            if selectedMaterialId.isEmpty, let first = materials.first {
+            if selectedMaterialId.isEmpty, let first = activeMaterials.first {
                 selectedMaterialId = first.id
             }
         } catch {

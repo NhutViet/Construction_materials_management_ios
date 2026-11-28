@@ -88,9 +88,18 @@ struct StockInInsertPayload: Encodable {
 
 struct StockInDraftItem: Identifiable {
     let id = UUID()
-    let material: Material
+    var material: Material
     var quantity: Double
     var unitPrice: Double
+    var isNewMaterial: Bool = false
 
     var total: Double { roundMoney(quantity * unitPrice) }
+}
+
+struct StockInItemInput {
+    let materialId: String?
+    let materialName: String
+    let unit: String
+    let quantity: Double
+    let unitPrice: Double
 }

@@ -28,4 +28,23 @@ struct Material: Codable, Identifiable {
     var isLowStock: Bool { quantityValue <= minStockValue }
     var priceValue: Double { price ?? 0 }
     var unitValue: String { unit?.isEmpty == false ? unit! : "đơn vị" }
+    var isInactive: Bool { isActive == false }
+    var isAvailable: Bool { isActive != false }
+}
+
+enum MaterialOptions {
+    static let categories = [
+        "Vật liệu xây dựng",
+        "Thiết bị điện",
+        "Thiết bị nước",
+        "Vật liệu trang trí",
+        "Công cụ",
+        "An toàn lao động",
+        "Vật liệu nội thất",
+        "Khác"
+    ]
+
+    static let units = [
+        "viên", "kg", "m", "m²", "m³", "lít", "thùng", "cuộn", "tấm", "bộ", "bao", "cái"
+    ]
 }

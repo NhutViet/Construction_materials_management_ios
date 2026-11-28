@@ -23,7 +23,7 @@ struct DashboardView: View {
     }
 
     private var lowStockCount: Int {
-        materials.filter(\.isLowStock).count
+        materials.filter { $0.isAvailable && $0.isLowStock }.count
     }
 
     var body: some View {
@@ -102,6 +102,9 @@ struct DashboardView: View {
         .refreshable { await load() }
         .task { if invoices.isEmpty { await load() } }
         .onReceive(NotificationCenter.default.publisher(for: .invoicesDidChange)) { _ in
+            Task { await load() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .materialsDidChange)) { _ in
             Task { await load() }
         }
         .toolbar {
